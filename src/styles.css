@@ -5,3 +5,7 @@
 html {
     @apply overflow-y-scroll;
 }
+
+.selected {
+    @apply bg-green-500 text-white;
+}
