@@ -1,0 +1,7 @@
+.env
+
+# Node dependencies
+node_modules
+
+.git
+.idea

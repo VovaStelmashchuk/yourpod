@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android story podacst</title>
+    <link href="styles.css" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+</head>
+
+
+<body class="bg-gray-100 text-gray-900 font-sans">
+<div class="container mx-auto py-8">
+    <div class="bg-gray-200 p-6 rounded-lg mb-8 text-center">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4">Android Story Podcast</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="https://androidstory.dev/files/rss.xml" target="_blank">
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full">Наш RSS
+                    тут
+                </button>
+            </a>
+            <a href="https://open.spotify.com/show/4DzbFWyfcFX5zzh6MicCfM?si=99dda8490dd942c7" target="_blank">
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full">Spotify
+                    для
+                    патреонів
+                </button>
+            </a>
+            <a href="https://www.patreon.com/androidstory" target="_blank">
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full">Більше
+                    цікавого
+                    тут
+                </button>
+            </a>
+            <a href="https://www.youtube.com/channel/UC6-NFk4uOGsKvyisL1QC3rw" target="_blank">
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full">YouTube
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <div id="tabs" hx-target="#tab-contents" role="tablist"
+         hx-on:htmx-after-on-load="let currentTab = document.querySelector('[aria-selected=true]');
+                           currentTab.setAttribute('aria-selected', 'false')
+                           currentTab.classList.remove('selected')
+                           let newTab = event.target
+                           newTab.setAttribute('aria-selected', 'true')
+                           newTab.classList.add('selected')">
+        <button role="tab" aria-controls="tab-contents" aria-selected="true" hx-get="/tab-podcast-list"
+                class="px-4 py-2 font-semibold text-black bg-gray-200 rounded-t-md focus:outline-none">Podcasts
+        </button>
+        <button role="tab" aria-controls="tab-contents" aria-selected="false" hx-get="/tab-about"
+                class="px-4 py-2 font-semibold text-black bg-gray-200 rounded-t-md focus:outline-none">
+            About
+        </button>
+    </div>
+    <div id="tab-contents" role="tabpanel" hx-get="/tab-podcast-list" hx-trigger="load"
+         class="p-4">
+    </div>
+</div>
+</body>
+
+</html>
