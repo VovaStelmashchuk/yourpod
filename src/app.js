@@ -1,10 +1,13 @@
 // server.js
 const Hapi = require('@hapi/hapi');
 const Inert = require('@hapi/inert');
+const Vision = require('@hapi/vision');
 const {home} = require("./routers/home");
 const Handlebars = require('handlebars');
 const {podcastDetails} = require("./routers/details");
 const staticFiles = require("./routers/staticFiles");
+const {admin} = require("./routers/admin/login");
+const {adminAuth} = require("./routers/admin/auth");
 
 function registerViewFunctions() {
   Handlebars.registerHelper('eq', (a, b) => a === b);
@@ -16,9 +19,8 @@ const init = async () => {
     host: 'localhost'
   });
 
-  // Register inert plugin
   await server.register(Inert);
-  await server.register(require('@hapi/vision'));
+  await server.register(Vision);
 
   server.views({
     engines: {html: Handlebars},
@@ -32,8 +34,12 @@ const init = async () => {
   registerViewFunctions()
 
   await staticFiles(server);
+
+  await adminAuth(server);
+
   home(server);
   podcastDetails(server);
+  admin(server);
 
   await server.start();
   console.log('Server running on %s', server.info.uri);

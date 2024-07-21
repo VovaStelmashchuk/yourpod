@@ -32,7 +32,14 @@ async function podcastDetailsHandler(request, h) {
 }
 
 function podcastDetails(server) {
-  server.route({method: 'GET', path: '/podcast/{slug}', handler: podcastDetailsHandler});
+  server.route({
+    method: 'GET',
+    path: '/podcast/{slug}',
+    handler: podcastDetailsHandler,
+    options: {
+      auth: false
+    }
+  });
 }
 
 module.exports = {

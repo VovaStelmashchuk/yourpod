@@ -9,6 +9,9 @@ function staticFiles(server) {
       directory: {
         path: 'src/public'
       }
+    },
+    options: {
+      auth: false
     }
   });
 }

@@ -31,9 +31,30 @@ function aboutHandler(request, h) {
 
 
 function home(server) {
-  server.route({method: 'GET', path: '/', handler: homeHandler});
-  server.route({method: 'GET', path: '/tab-podcast-list', handler: podcastListHandler});
-  server.route({method: 'GET', path: '/tab-about', handler: aboutHandler});
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: homeHandler,
+    options: {
+      auth: false
+    }
+  });
+  server.route({
+    method: 'GET',
+    path: '/tab-podcast-list',
+    handler: podcastListHandler,
+    options: {
+      auth: false
+    }
+  });
+  server.route({
+    method: 'GET',
+    path: '/tab-about',
+    handler: aboutHandler,
+    options: {
+      auth: false
+    }
+  });
 }
 
 
