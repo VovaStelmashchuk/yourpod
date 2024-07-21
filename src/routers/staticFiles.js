@@ -1,3 +1,6 @@
+'use strict';
+
+
 function staticFiles(server) {
   server.route({
     method: 'GET',

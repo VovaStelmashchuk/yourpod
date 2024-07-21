@@ -1,9 +1,14 @@
 // server.js
 const Hapi = require('@hapi/hapi');
-const Path = require('path');
 const Inert = require('@hapi/inert');
-const home = require("./routers/home");
+const {home} = require("./routers/home");
+const Handlebars = require('handlebars');
+const {podcastDetails} = require("./routers/details");
 const staticFiles = require("./routers/staticFiles");
+
+function registerViewFunctions() {
+  Handlebars.registerHelper('eq', (a, b) => a === b);
+}
 
 const init = async () => {
   const server = Hapi.server({
@@ -13,31 +18,22 @@ const init = async () => {
 
   // Register inert plugin
   await server.register(Inert);
+  await server.register(require('@hapi/vision'));
+
+  server.views({
+    engines: {html: Handlebars},
+    relativeTo: __dirname,
+    partialsPath: 'templates/partials',
+    path: 'templates/pages',
+    layout: true,
+    layoutPath: 'templates/layouts'
+  });
+
+  registerViewFunctions()
 
   await staticFiles(server);
-
-  // Serve static files
-  server.route({
-    method: 'GET',
-    path: '/{param*}',
-    handler: {
-      directory: {
-        path: Path.join(__dirname, 'public'),
-        listing: false
-      }
-    }
-  });
-
-  // Handle the main route
-  server.route({
-    method: 'GET',
-    path: '/',
-    handler: async (request, h) => {
-      return h.file('src/public/index.html');
-    }
-  });
-
   home(server);
+  podcastDetails(server);
 
   await server.start();
   console.log('Server running on %s', server.info.uri);

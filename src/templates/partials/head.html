@@ -1,0 +1,33 @@
+<div>
+    <div class="bg-gray-200 p-6 rounded-lg mb-8 text-center cursor-pointer" id="header">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4">Android Story Podcast</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 container max-w-screen-xl mx-auto">
+            <a href="https://androidstory.dev/files/rss.xml" target="_blank">
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full">
+                    Наш RSS тут
+                </button>
+            </a>
+            <a href="https://open.spotify.com/show/4DzbFWyfcFX5zzh6MicCfM?si=99dda8490dd942c7" target="_blank">
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full">
+                    Spotify для патреонів
+                </button>
+            </a>
+            <a href="https://www.patreon.com/androidstory" target="_blank">
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full">
+                    Більше цікавого тут
+                </button>
+            </a>
+            <a href="https://www.youtube.com/channel/UC6-NFk4uOGsKvyisL1QC3rw" target="_blank">
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full">
+                    YouTube
+                </button>
+            </a>
+        </div>
+    </div>
+    <script>
+      document.getElementById('header')
+        .addEventListener('click', function () {
+          window.location.href = '/';
+        });
+    </script>
+</div>

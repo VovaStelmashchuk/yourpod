@@ -12,6 +12,11 @@ function getPosts() {
   ).toArray();
 }
 
+function getPostBySlug(slug) {
+  return Database.collection('posts').findOne({slug: slug});
+}
+
 module.exports = {
-  getPosts
+  getPosts,
+  getPostBySlug
 }
