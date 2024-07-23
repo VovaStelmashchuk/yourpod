@@ -7,7 +7,6 @@ async function podcastDetailsHandler(request, h) {
   const podcast = await getPostBySlug(slug);
 
   return h.view('podcastDetails', {
-      imageUrl: "",
       title: podcast.title,
       audioUrl: buildObjectURL('episodes/' + podcast.audio_file_key),
       chapters: podcast.charters.map(chapter => {

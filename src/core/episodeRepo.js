@@ -1,7 +1,7 @@
 const {Database} = require("./client");
 
 
-function getPosts() {
+function getPublicPosts() {
   return Database.collection('posts').find({
       'visibility': 'public'
     }, {
@@ -12,11 +12,22 @@ function getPosts() {
   ).toArray();
 }
 
+function getAllPosts() {
+  return Database.collection('posts').find({}, {
+      sort: {
+        'publish_date': -1
+      }
+    }
+  ).toArray();
+}
+
+
 function getPostBySlug(slug) {
   return Database.collection('posts').findOne({slug: slug});
 }
 
 module.exports = {
-  getPosts,
-  getPostBySlug
+  getPublicPosts,
+  getAllPosts,
+  getPostBySlug,
 }

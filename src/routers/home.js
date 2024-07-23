@@ -1,11 +1,11 @@
-const {getPosts} = require("../core/episodeRepo");
+const {getPublicPosts} = require("../core/episodeRepo");
 
 async function homeHandler(request, h) {
   return h.view('home', {}, {layout: 'layout'});
 }
 
 async function podcastListHandler(request, h) {
-  const posts = await getPosts();
+  const posts = await getPublicPosts();
   const postsWithChartersDescription = posts.map(post => ({
     ...post,
     chartersDescription: post.charters ? post.charters.map(charter => charter.description).join(' ') : '',

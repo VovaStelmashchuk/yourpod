@@ -11,7 +11,9 @@ async function postLogin(request, h) {
   const {sessionId, expiresAt, error} = await addSessionToUser(username, password);
 
   if (error) {
-    return h.response('<div class="text-red-500">Invalid username or password. Please try again.</div>').type('text/html');
+    return h
+      .response('<div class="text-red-500 py-2">Invalid username or password. Please try again.</div>')
+      .type('text/html');
   }
 
   if (sessionId && expiresAt) {
