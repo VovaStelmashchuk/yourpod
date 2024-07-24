@@ -1,11 +1,11 @@
-const {getAllPosts, getPostBySlug} = require("../../core/episodeRepo");
+const {getAllPosts, getPostBySlug, updatePodcastNameBySlug} = require("../../core/episodeRepo");
 const {buildObjectURL} = require("../../minio/utils");
 
-async function dashboardView(request, h) {
+async function dashboardView(_, h) {
   return h.view('admin/dashboard', {}, {layout: 'admin',})
 }
 
-async function adminPodcastList(request, h) {
+async function adminPodcastList(_, h) {
   const posts = await getAllPosts()
 
   const uiPosts = posts.map(post => ({
@@ -27,7 +27,7 @@ async function updatePodcastName(request, h) {
   const slug = request.params.slug;
   const newName = request.payload.episode_name;
 
-  console.log(`Updating podcast name for ${slug} to ${newName}`);
+  await updatePodcastNameBySlug(slug, newName);
 
   return h.response().code(200);
 }

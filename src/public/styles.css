@@ -621,10 +621,6 @@ video {
   margin-bottom: 2rem;
 }
 
-.ml-4 {
-  margin-left: 1rem;
-}
-
 .mr-4 {
   margin-right: 1rem;
 }
@@ -675,20 +671,12 @@ video {
   aspect-ratio: 1 / 1;
 }
 
-.h-5 {
-  height: 1.25rem;
-}
-
 .h-full {
   height: 100%;
 }
 
 .w-24 {
   width: 6rem;
-}
-
-.w-5 {
-  width: 1.25rem;
 }
 
 .w-64 {
@@ -705,16 +693,6 @@ video {
 
 .flex-1 {
   flex: 1 1 0%;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
 }
 
 .cursor-pointer {
@@ -934,14 +912,6 @@ video {
 
 .no-underline {
   text-decoration-line: none;
-}
-
-.opacity-25 {
-  opacity: 0.25;
-}
-
-.opacity-75 {
-  opacity: 0.75;
 }
 
 .shadow-md {
