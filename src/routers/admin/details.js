@@ -9,3 +9,17 @@ async function updatePodcastName(request, h) {
   return h.response().code(200);
 }
 
+function editPodcastDetails(server) {
+  server.route({
+    method: 'PUT',
+    path: '/admin/podcast/{slug}/update-name',
+    handler: updatePodcastName,
+    options: {
+      auth: 'adminSession',
+    }
+  })
+}
+
+module.exports = {
+  editPodcastDetails
+}; 

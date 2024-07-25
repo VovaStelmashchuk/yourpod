@@ -2,12 +2,12 @@
 const Hapi = require('@hapi/hapi');
 const Inert = require('@hapi/inert');
 const Vision = require('@hapi/vision');
-const {home} = require("./routers/home");
+const { home } = require("./routers/home");
 const Handlebars = require('handlebars');
-const {podcastDetails} = require("./routers/details");
+const { podcastDetails } = require("./routers/details");
 const staticFiles = require("./routers/staticFiles");
-const {admin} = require("./routers/admin/login");
-const {adminAuth} = require("./routers/admin/auth");
+const { admin } = require("./routers/admin/login");
+const { adminAuth } = require("./routers/admin/auth");
 const { editPodcastDetails } = require('./routers/admin/details');
 
 function registerViewFunctions() {
@@ -24,7 +24,7 @@ const init = async () => {
   await server.register(Vision);
 
   server.views({
-    engines: {html: Handlebars},
+    engines: { html: Handlebars },
     relativeTo: __dirname,
     partialsPath: 'templates/partials',
     path: 'templates/pages',
@@ -41,7 +41,7 @@ const init = async () => {
   home(server);
   podcastDetails(server);
   admin(server);
-//  editPodcastDetails(server);
+  editPodcastDetails(server);
 
   await server.start();
   console.log('Server running on %s', server.info.uri);

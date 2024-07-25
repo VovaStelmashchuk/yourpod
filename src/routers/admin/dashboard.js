@@ -1,16 +1,16 @@
 const { getAllPosts, getPostBySlug } = require("../../core/episodeRepo");
 const { buildObjectURL } = require("../../minio/utils");
 
-async function dashboardView(_, h) {
+async function dashboardView(request, h) {
   return h.view('admin/dashboard', {}, { layout: 'admin', })
 }
 
-async function adminPodcastList(_, h) {
-  const posts = await getAllPosts()
+async function adminPodcastList(request, h) {
+  const posts = await getAllPosts() 
 
   const uiPosts = posts.map(post => ({
     ...post,
-    detailUrl: `/admin/podcast/${post.slug}`,
+detailUrl: `/admin/podcast/${post.slug}`,
   }));
 
   return h.view(
