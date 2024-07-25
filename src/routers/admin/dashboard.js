@@ -1,8 +1,8 @@
-const {getAllPosts, getPostBySlug, updatePodcastNameBySlug} = require("../../core/episodeRepo");
-const {buildObjectURL} = require("../../minio/utils");
+const { getAllPosts, getPostBySlug } = require("../../core/episodeRepo");
+const { buildObjectURL } = require("../../minio/utils");
 
 async function dashboardView(_, h) {
-  return h.view('admin/dashboard', {}, {layout: 'admin',})
+  return h.view('admin/dashboard', {}, { layout: 'admin', })
 }
 
 async function adminPodcastList(_, h) {
@@ -18,18 +18,9 @@ async function adminPodcastList(_, h) {
     {
       posts: uiPosts,
     }, {
-      layout: false,
-    }
+    layout: false,
+  }
   )
-}
-
-async function updatePodcastName(request, h) {
-  const slug = request.params.slug;
-  const newName = request.payload.episode_name;
-
-  await updatePodcastNameBySlug(slug, newName);
-
-  return h.response().code(200);
 }
 
 async function podcastDetailsHandler(request, h) {
@@ -43,8 +34,15 @@ async function podcastDetailsHandler(request, h) {
       title: podcast.title,
       slug: slug,
       audioUrl: buildObjectURL('episodes/' + podcast.audio_file_key),
+      timecodes: podcast.charters.map(chapter => {
+        return {
+          time: chapter.time,
+          title: chapter.description,
+          timeInSeconds: chapter.time.split(':').reduce((acc, time) => (60 * acc) + +time)
+        }
+      })
     },
-    {layout: 'admin'}
+    { layout: 'admin' }
   )
 }
 
@@ -70,14 +68,6 @@ function adminDashboard(server) {
     method: 'GET',
     path: '/admin/podcast/{slug}',
     handler: podcastDetailsHandler,
-    options: {
-      auth: 'adminSession',
-    }
-  })
-  server.route({
-    method: 'PUT',
-    path: '/admin/podcast/{slug}/update-name',
-    handler: updatePodcastName,
     options: {
       auth: 'adminSession',
     }

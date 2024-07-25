@@ -8,6 +8,7 @@ const {podcastDetails} = require("./routers/details");
 const staticFiles = require("./routers/staticFiles");
 const {admin} = require("./routers/admin/login");
 const {adminAuth} = require("./routers/admin/auth");
+const { editPodcastDetails } = require('./routers/admin/details');
 
 function registerViewFunctions() {
   Handlebars.registerHelper('eq', (a, b) => a === b);
@@ -33,13 +34,14 @@ const init = async () => {
 
   registerViewFunctions()
 
-  await staticFiles(server);
+  staticFiles(server);
 
   await adminAuth(server);
 
   home(server);
   podcastDetails(server);
   admin(server);
+//  editPodcastDetails(server);
 
   await server.start();
   console.log('Server running on %s', server.info.uri);
