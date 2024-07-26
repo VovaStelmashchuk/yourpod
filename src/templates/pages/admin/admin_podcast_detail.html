@@ -1,9 +1,10 @@
 <div class="p-6">
   <div>
     <label for="episode_name" class="block text-black font-medium text-2xl mb-2">Name</label>
-    <input type="text" id="episode_name" name="episode_name" class="input-field focus:outline-none focus:shadow-outline"
-      placeholder="Episode name" value="{{title}}" hx-put="/admin/podcast/{{slug}}/update-name"
-      hx-trigger="keyup changed delay:1s" hx-include="[name=episode_name]" hx-swap="none">
+    <input type="text" id="episode_name" name="episode_name"
+      class="input-field w-full" placeholder="Episode name" value="{{title}}"
+      hx-put="/admin/podcast/{{slug}}/update-name" hx-trigger="keyup changed delay:1s" hx-include="[name=episode_name]"
+      hx-swap="none">
   </div>
 
   <div class="w-full sm:p-0 sm:m-0 mx-auto-2 lg:px-0">

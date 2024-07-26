@@ -17,7 +17,8 @@ function registerViewFunctions() {
 const init = async () => {
   const server = Hapi.server({
     port: 3000,
-    host: 'localhost'
+    host: 'localhost',
+    debug: { request: ['error'] }
   });
 
   await server.register(Inert);
