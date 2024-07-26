@@ -1,9 +1,14 @@
 <div class="timecode-entry w-full mx-auto flex space-x-2">
-  <input value="{{hour}}" name="hours" placeholder="HH" min="0" max="23" class="w-16 px-2 py-1 border rounded">
-  <input value="{{minute}}" type="number" name="minutes" placeholder="MM" min="0" max="59"
+  <input value="{{hour}}" name="hours" placeholder="HH" min="0" max="23" hx-trigger="change"
+    hx-put="/admin/podcast/{{slug}}/timecodes/{{index}}" hx-swap="none" hx-include="closest .timecode-entry"
     class="w-16 px-2 py-1 border rounded">
-  <input value="{{second}}" type="number" name="seconds" placeholder="SS" min="0" max="59"
+  <input value="{{minute}}" type="number" name="minutes" placeholder="MM" min="0" max="59" hx-trigger="change"
+    hx-put="/admin/podcast/{{slug}}/timecodes/{{index}}" hx-swap="none" hx-include="closest .timecode-entry"
     class="w-16 px-2 py-1 border rounded">
-  <input value="{{description}}"type="text" name="text" placeholder="Description" hx-post="/save-text" hx-trigger="change"
-    hx-include="closest .timecode-entry" class="flex-1 px-2 py-1 border rounded">
+  <input value="{{second}}" type="number" name="seconds" placeholder="SS" min="0" max="59" hx-trigger="change"
+    hx-put="/admin/podcast/{{slug}}/timecodes/{{index}}" hx-swap="none" hx-include="closest .timecode-entry"
+    class="w-16 px-2 py-1 border rounded">
+  <input value="{{description}}" type="text" name="text" placeholder="Description" hx-trigger="change"
+    hx-put="/admin/podcast/{{slug}}/timecodes/{{index}}" hx-swap="none" hx-include="closest .timecode-entry"
+    class="flex-1 px-2 py-1 border focus:border-black rounded">
 </div>

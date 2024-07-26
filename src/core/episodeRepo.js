@@ -25,6 +25,17 @@ function updatePodcastNameBySlug(slug, podcastName) {
   return Database.collection('posts').updateOne({ slug: slug }, { $set: { title: podcastName } });
 }
 
+function updateTimeCodeBySlug(slug, index, time, description) {
+  return Database.collection('posts').updateOne(
+    { slug: slug },
+    {
+      $set: {
+        [`charters.${index}.time`]: time,
+        [`charters.${index}.description`]: description
+      }
+    }
+  );
+}
 function getPostBySlug(slug) {
   return Database.collection('posts').findOne({ slug: slug });
 }
@@ -34,4 +45,5 @@ module.exports = {
   getAllPosts,
   getPostBySlug,
   updatePodcastNameBySlug,
+  updateTimeCodeBySlug,
 }

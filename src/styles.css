@@ -14,9 +14,6 @@
         -moz-appearance: textfield; /* Firefox */
     }
 
-    input:focus {
-        @apply border-black;
-    }
     input {
         @apply text-black;
     }

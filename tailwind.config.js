@@ -8,12 +8,6 @@ module.exports = {
         'focus-black': '#000', // Custom border color for focus
       },
     },
-    variants: {
-      extend: {
-        display: ['focus'],
-        borderColor: ['focus'],
-      },
-    },
   },
   plugins: [],
 }
