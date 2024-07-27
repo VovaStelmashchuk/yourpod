@@ -58,7 +58,7 @@ async function updateTimeCode(request, h) {
 
   await updateTimeCodeBySlug(slug, index, time, text);
 
-  return h.response().code(200);
+  return h.response().code(200).header('HX-Trigger', 'update-preview');
 }
 
 async function updateLink(request, h) {
@@ -68,8 +68,7 @@ async function updateLink(request, h) {
   const index = request.params.index;
 
   await updateLinkBySlug(slug, index, link, text);
-
-  return h.response().code(200);
+  return h.response().code(200).header('HX-Trigger', 'update-preview');
 }
 
 async function addTimeCode(request, h) {
