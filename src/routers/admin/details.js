@@ -1,4 +1,4 @@
-const { getPostBySlug, updatePodcastNameBySlug, updateTimeCodeBySlug } = require("../../core/episodeRepo");
+const { getPostBySlug, updatePodcastNameBySlug, updateTimeCodeBySlug, updateLinkBySlug } = require("../../core/episodeRepo");
 const { buildObjectURL } = require("../../minio/utils");
 
 async function updatePodcastName(request, h) {
@@ -34,6 +34,14 @@ async function podcastDetailsHandler(request, h) {
           minute: minute,
           second: second,
         }
+      }),
+      links: podcast.links.map((link, index) => {
+        return {
+          slug: podcast.slug,
+          index: index,
+          link: link.link,
+          text: link.title,
+        }
       })
     },
     { layout: 'admin' }
@@ -53,6 +61,17 @@ async function updateTimeCode(request, h) {
   return h.response().code(200);
 }
 
+async function updateLink(request, h) {
+  const { link, text } = request.payload;
+
+  const slug = request.params.slug;
+  const index = request.params.index;
+
+  await updateLinkBySlug(slug, index, link, text);
+
+  return h.response().code(200);
+}
+
 async function addTimeCode(request, h) {
   const slug = request.params.slug;
   const podcast = await getPostBySlug(slug);
@@ -61,6 +80,24 @@ async function addTimeCode(request, h) {
 
   return h.view(
     'edit_podcast_time_code_wrapper',
+    {
+      slug: slug,
+      index: index,
+    },
+    {
+      layout: false
+    }
+  );
+}
+
+async function addLink(request, h) {
+  const slug = request.params.slug;
+  const podcast = await getPostBySlug(slug);
+
+  const index = podcast.links.length;
+
+  return h.view(
+    'editable_link_wrapper',
     {
       slug: slug,
       index: index,
@@ -100,9 +137,27 @@ function editPodcastDetails(server) {
   });
 
   server.route({
+    method: 'PUT',
+    path: '/admin/podcast/{slug}/links/{index}',
+    handler: updateLink,
+    options: {
+      auth: 'adminSession',
+    }
+  });
+
+  server.route({
     method: 'POST',
     path: '/admin/podcast/{slug}/add-timecode',
     handler: addTimeCode,
+    options: {
+      auth: 'adminSession',
+    }
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/admin/podcast/{slug}/add-link',
+    handler: addLink,
     options: {
       auth: 'adminSession',
     }

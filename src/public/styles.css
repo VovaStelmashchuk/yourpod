@@ -710,6 +710,10 @@ input {
   width: 100%;
 }
 
+.w-1\/2 {
+  width: 50%;
+}
+
 .max-w-screen-xl {
   max-width: 1280px;
 }
