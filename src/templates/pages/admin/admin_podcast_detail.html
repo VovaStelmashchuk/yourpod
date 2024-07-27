@@ -14,7 +14,7 @@
       </audio>
     </div>
   </div>
-  <div>
+  <div class="my-4">
     <h2 class="text-2xl">Time codes</h2>
     <div id="timecodes-list" class="grid grid-cols-1 gap-4 py-2">
       {{#each timecodes}}
@@ -22,7 +22,7 @@
       {{/each}}
     </div>
     <button hx-target="#timecodes-list" hx-swap="beforeend" hx-post="/admin/podcast/{{slug}}/add-timecode"
-      class="w-full bg-transparent text-black border border-black px-4 py-2 rounded hover:bg-black hover:text-white">
+      class="common-button w-full px-4 py-2 my-2">
       Add time code
     </button>
   </div>
@@ -34,12 +34,17 @@
       {{/each}}
     </div>
     <button hx-target="#links-list" hx-swap="beforeend" hx-post="/admin/podcast/{{slug}}/add-link"
-      class="w-full bg-transparent text-black border border-black px-4 py-2 rounded hover:bg-black hover:text-white">
+      class="common-button w-full px-4 py-2 my-2">
       Add link
     </button>
   </div>
-  <div>
-    <h2 class="text-2xl border">Preview episode</h2>
+
+  <h2 class="text-2xl">Preview episode</h2>
+  <div class="border-2 border-black p-8 mt-2">
     <div hx-get="/podcast/{{slug}}?preview=true" hx-swap="innerHTML" hx-trigger="update-preview from:body, load"></div>
   </div>
+
+  <h2 class="text-2xl my-4">Youtube description</h2>
+  <div hx-get="/admin/podcast/{{slug}}/youtube-description" hx-swap="innerHTML" hx-trigger="load"></div>
+
 </div>

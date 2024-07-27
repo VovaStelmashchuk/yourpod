@@ -1,5 +1,6 @@
 const { getPostBySlug, updatePodcastNameBySlug, updateTimeCodeBySlug, updateLinkBySlug } = require("../../core/episodeRepo");
 const { buildObjectURL } = require("../../minio/utils");
+const { buildYoutbeDescription } = require("../../core/generator");
 
 async function updatePodcastName(request, h) {
   const slug = request.params.slug;
@@ -107,6 +108,24 @@ async function addLink(request, h) {
   );
 }
 
+async function youtbeTextComponent(request, h) {
+  const slug = request.params.slug;
+
+  const podcast = await getPostBySlug(slug);
+  const description = buildYoutbeDescription(podcast);
+
+  return h.view(
+    'admin/youtube_text',
+    {
+      slug: slug,
+      text: description,
+    },
+    {
+      layout: false
+    }
+  );
+}
+
 function editPodcastDetails(server) {
   server.route({
     method: 'PUT',
@@ -157,6 +176,15 @@ function editPodcastDetails(server) {
     method: 'POST',
     path: '/admin/podcast/{slug}/add-link',
     handler: addLink,
+    options: {
+      auth: 'adminSession',
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/admin/podcast/{slug}/youtube-description',
+    handler: youtbeTextComponent,
     options: {
       auth: 'adminSession',
     }

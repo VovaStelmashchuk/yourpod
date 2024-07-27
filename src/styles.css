@@ -3,31 +3,40 @@
 @tailwind utilities;
 
 @layer base {
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-        @apply appearance-none;
-        margin: 0;
-    }
 
-    input[type="number"] {
-        @apply appearance-none;
-        -moz-appearance: textfield; /* Firefox */
-    }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    @apply appearance-none;
+    margin: 0;
+  }
 
-    input {
-        @apply text-black;
-    }
+  input[type="number"] {
+    @apply appearance-none;
+    -moz-appearance: textfield;
+    /* Firefox */
+  }
+
+  input:focus {
+    @apply border-black;
+  }
+
+  input {
+    @apply text-black;
+  }
+
+  .common-button {
+    @apply bg-transparent text-black border border-black rounded hover:bg-black hover:text-white
+  }
 }
 
 html {
-    @apply overflow-y-scroll;
+  @apply overflow-y-scroll;
 }
 
 .selected {
-    @apply bg-green-500 text-white;
+  @apply bg-green-500 text-white;
 }
 
 .input-field {
-    @apply rounded py-2 px-3 leading-tight 
+  @apply rounded py-2 px-3 leading-tight
 }
-
