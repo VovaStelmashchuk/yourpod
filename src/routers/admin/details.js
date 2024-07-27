@@ -7,7 +7,7 @@ async function updatePodcastName(request, h) {
 
   await updatePodcastNameBySlug(slug, newName);
 
-  return h.response().code(200);
+  return h.response().code(200).header('HX-Trigger', 'update-preview');
 }
 
 async function podcastDetailsHandler(request, h) {
