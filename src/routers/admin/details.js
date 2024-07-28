@@ -1,6 +1,6 @@
 const { getPostBySlug, updatePodcastNameBySlug, updateTimeCodeBySlug, updateLinkBySlug } = require("../../core/episodeRepo");
 const { buildObjectURL } = require("../../minio/utils");
-const { buildYoutbeDescription } = require("../../core/generator");
+const { buildYoutubePublicDescription, buildYoutubePatreonDescription } = require("../../core/generator");
 
 async function updatePodcastName(request, h) {
   const slug = request.params.slug;
@@ -34,6 +34,7 @@ async function podcastDetailsHandler(request, h) {
           hour: hour,
           minute: minute,
           second: second,
+          isPublic: chapter.isPublic,
         }
       }),
       links: podcast.links.map((link, index) => {
@@ -50,14 +51,16 @@ async function podcastDetailsHandler(request, h) {
 }
 
 async function updateTimeCode(request, h) {
-  const { hours, minutes, seconds, text } = request.payload;
+  const { hours, minutes, seconds, text, isPublic } = request.payload;
+  // make isPublic false in case it is undefined
+  const isPublicValue = isPublic === 'on' ? true : false;
 
   const slug = request.params.slug;
   const index = request.params.index;
 
   const time = `${hours}:${minutes}:${seconds}`;
 
-  await updateTimeCodeBySlug(slug, index, time, text);
+  await updateTimeCodeBySlug(slug, index, time, text, isPublicValue);
 
   return h.response().code(200).header('HX-Trigger', 'update-preview');
 }
@@ -112,13 +115,15 @@ async function youtbeTextComponent(request, h) {
   const slug = request.params.slug;
 
   const podcast = await getPostBySlug(slug);
-  const description = buildYoutbeDescription(podcast);
+  const publicDescription = buildYoutubePublicDescription(podcast);
+  const patreonDescription = buildYoutubePatreonDescription(podcast);
 
   return h.view(
     'admin/youtube_text',
     {
       slug: slug,
-      text: description,
+      public_text: publicDescription,
+      patreon_text: patreonDescription,
     },
     {
       layout: false

@@ -29,13 +29,14 @@ function updatePodcastNameBySlug(slug, podcastName) {
   return Database.collection('posts').updateOne({ slug: slug }, { $set: { title: podcastName } });
 }
 
-function updateTimeCodeBySlug(slug, index, time, description) {
+function updateTimeCodeBySlug(slug, index, time, description, isPublicValue) {
   return Database.collection('posts').updateOne(
     { slug: slug },
     {
       $set: {
         [`charters.${index}.time`]: time,
-        [`charters.${index}.description`]: description
+        [`charters.${index}.description`]: description,
+        [`charters.${index}.isPublic`]: isPublicValue,
       }
     }
   );

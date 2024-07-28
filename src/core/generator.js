@@ -54,7 +54,7 @@ async function updateRss() {
   const podcastCount = podcasts.length;
 
   podcasts.forEach((post, index) => {
-    let description = buildDescription(post);
+    let description = buildRssDescription(post);
 
     let linkToEpisode = `${config.host}/podcast/${post.slug}`;
 
@@ -89,13 +89,41 @@ async function updateRss() {
   await uploadFile('rss_1.xml', feed.buildXml());
 }
 
-function buildDescription(post) {
+function buildPublicChapters(chapters) {
+  const adjustedChapters = [];
+  let totalPrivateChaptersTime = 0;
+  let previousChapterStartTimeSeconds = 0;
+
+  chapters.forEach((chapter, index) => {
+    const chapterStartTimeInSeconds = chapter.time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
+
+    if (chapter.isPublic !== false) {
+      const adjustedTimeInSeconds = chapterStartTimeInSeconds - totalPrivateChaptersTime;
+      adjustedChapters.push({
+        time: new Date(adjustedTimeInSeconds * 1000).toISOString().substr(11, 8),
+        description: chapter.description,
+      });
+    } else {
+      const nextChapterTime = chapters[index + 1]?.time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
+      totalPrivateChaptersTime += nextChapterTime - chapterStartTimeInSeconds;
+    }
+
+    previousChapterStartTimeSeconds = chapterStartTimeInSeconds;
+  });
+
+  return adjustedChapters;
+}
+
+function buildRssDescription(post) {
   let description = 'В цьому випуску ';
   if (post.charters) {
+    const publicChapters = buildPublicChapters(post.charters);
     description += '<ul>'
-    post.charters.forEach(chapter => {
-      description += `<li>${chapter.time} - <em>${chapter.description}</em></li>`;
-    });
+    publicChapters
+      .filter(chapter => chapter.isPublic)
+      .forEach(chapter => {
+        description += `<li>${chapter.time} - <em>${chapter.description}</em></li>`;
+      });
     description += '</ul>'
   }
 
@@ -113,28 +141,49 @@ function buildDescription(post) {
   return description
 }
 
-function buildYoutbeDescription(post) {
+function buildYoutubePublicDescription(post) {
   let description = 'В цьому випуску \n';
   if (post.charters) {
-    post.charters.forEach(chapter => {
-      description += `${chapter.time} - ${chapter.description} \n`;
-    });
-    description += ''
+    const publicChapters = buildPublicChapters(post.charters);
+    publicChapters
+      .forEach(chapter => {
+        description += `${chapter.time} - ${chapter.description} \n`;
+      });
   }
 
+  return description + buildLinksBlock(post)
+}
+
+
+function buildYoutubePatreonDescription(post) {
+  let description = 'В цьому випуску \n';
+  if (post.charters) {
+    post.charters
+      .forEach(chapter => {
+        description += `${chapter.time} - ${chapter.description} \n`;
+      });
+  }
+
+  return description + buildLinksBlock(post)
+}
+
+function buildLinksBlock(post) {
+  let linksText = '';
   if (post.links) {
-    description += '\n';
-    description += 'Згадано в випуску \n';
+    linksText += '\n';
+    linksText += 'Згадано в випуску \n';
     post.links.forEach(link => {
-      description += `${link.link}`;
-      description += '\n';
+      linksText += `${link.link}`;
+      linksText += '\n';
     });
   }
 
-  return description
+  return linksText;
 }
 
 module.exports = {
   updateRss,
-  buildYoutbeDescription,
+  buildYoutubePublicDescription,
+  buildYoutubePatreonDescription,
+  buildPublicChapters
 }

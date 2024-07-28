@@ -1,5 +1,6 @@
 const { getPostBySlug } = require("../core/episodeRepo");
 const { buildObjectURL } = require("../minio/utils");
+const { buildPublicChapters } = require("../core/generator");
 
 async function podcastDetailsHandler(request, h) {
   const slug = request.params.slug;
@@ -9,18 +10,21 @@ async function podcastDetailsHandler(request, h) {
 
   const podcast = await getPostBySlug(slug);
 
+  const publicChapters = buildPublicChapters(podcast.charters)
+
   return h.view('podcastDetails',
     {
       title: podcast.title,
       audioUrl: buildObjectURL('episodes/' + podcast.audio_file_key),
-      chapters: podcast.charters.map(chapter => {
-        return {
-          time: chapter.time,
-          title: chapter.description,
-          timeInSeconds: chapter.time.split(':').reduce((acc, time) => (60 * acc) + +time)
+      chapters: publicChapters
+        .map(chapter => {
+          return {
+            time: chapter.time,
+            title: chapter.description,
+            timeInSeconds: chapter.time.split(':').reduce((acc, time) => (60 * acc) + +time)
+          }
         }
-      }
-      ),
+        ),
       links: podcast.links.map(link => {
         return {
           link: link.link,

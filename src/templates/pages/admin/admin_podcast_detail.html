@@ -44,7 +44,7 @@
     <div hx-get="/podcast/{{slug}}?preview=true" hx-swap="innerHTML" hx-trigger="update-preview from:body, load"></div>
   </div>
 
-  <h2 class="text-2xl my-4">Youtube description</h2>
-  <div hx-get="/admin/podcast/{{slug}}/youtube-description" hx-swap="innerHTML" hx-trigger="load"></div>
+  <div hx-get="/admin/podcast/{{slug}}/youtube-description" hx-swap="innerHTML"
+    hx-trigger="update-preview from:body, load"></div>
 
 </div>
