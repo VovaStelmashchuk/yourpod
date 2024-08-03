@@ -1,8 +1,10 @@
-var Minio = require('minio')
+import * as Minio from 'minio'
 
-require('dotenv').config();
+import dotenv from 'dotenv';
 
-const baseurl = process.env.BASE_URL
+dotenv.config();
+
+const baseurl = process.env.BASE_URL;
 
 const minioEndpoint = process.env.MINIO_END_POINT
 const minioPort = process.env.MINIO_PORT
@@ -18,23 +20,26 @@ const minioClient = new Minio.Client({
   secretKey: minioSecretKey,
 })
 
-function buildObjectURL(minioKey) {
+export function buildObjectURL(minioKey) {
   return `${baseurl}/files/${minioKey}`;
 }
 
-async function getFileSizeInByte(key) {
+export async function getFileSizeInByte(key) {
   const stat = await minioClient.statObject(bucketName, key)
   return stat.size
 }
 
-async function uploadFile(key, body) {
+export async function uploadFile(key, body) {
   await minioClient.putObject(bucketName, key, body, undefined, {
     'Content-Type': 'text/xml',
   })
 }
 
-module.exports = {
-  buildObjectURL,
-  getFileSizeInByte,
-  uploadFile,
+export async function downloadFile(key, localPath) {
+  await minioClient.fGetObject(bucketName, key, localPath, function(err) {
+    if (err) {
+      return console.log(err)
+    }
+    console.log(`success download file ${key} to ${localPath}`)
+  })
 }

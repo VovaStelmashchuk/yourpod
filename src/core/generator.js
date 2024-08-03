@@ -1,8 +1,9 @@
-const { Podcast } = require('podcast');
-const { getPublicPosts } = require('./episodeRepo');
-const { buildObjectURL, getFileSizeInByte, uploadFile } = require("../minio/utils");
+import { Podcast } from 'podcast';
 
-async function updateRss() {
+import { getPublicPosts } from './episodeRepo.js';
+import { buildObjectURL, getFileSizeInByte, uploadFile } from '../minio/utils.js';
+
+export async function updateRss() {
   const podcasts = getPublicPosts();
   const host = config.host;
   const logoUrl = buildObjectURL('logo.jpg')
@@ -89,7 +90,7 @@ async function updateRss() {
   await uploadFile('rss_1.xml', feed.buildXml());
 }
 
-function buildPublicChapters(chapters) {
+export function buildPublicChapters(chapters) {
   const adjustedChapters = [];
   let totalPrivateChaptersTime = 0;
   let previousChapterStartTimeSeconds = 0;
@@ -102,6 +103,7 @@ function buildPublicChapters(chapters) {
       adjustedChapters.push({
         time: new Date(adjustedTimeInSeconds * 1000).toISOString().substr(11, 8),
         description: chapter.description,
+        timeInSeconds: chapter.timeInSeconds,
       });
     } else {
       const nextChapterTime = chapters[index + 1]?.time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
@@ -141,7 +143,7 @@ function buildRssDescription(post) {
   return description
 }
 
-function buildYoutubePublicDescription(post) {
+export function buildYoutubePublicDescription(post) {
   let description = 'В цьому випуску \n';
   if (post.charters) {
     const publicChapters = buildPublicChapters(post.charters);
@@ -155,7 +157,7 @@ function buildYoutubePublicDescription(post) {
 }
 
 
-function buildYoutubePatreonDescription(post) {
+export function buildYoutubePatreonDescription(post) {
   let description = 'В цьому випуску \n';
   if (post.charters) {
     post.charters
@@ -181,9 +183,3 @@ function buildLinksBlock(post) {
   return linksText;
 }
 
-module.exports = {
-  updateRss,
-  buildYoutubePublicDescription,
-  buildYoutubePatreonDescription,
-  buildPublicChapters
-}

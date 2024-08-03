@@ -1,28 +1,34 @@
-// server.js
-const Hapi = require('@hapi/hapi');
-const Inert = require('@hapi/inert');
-const Vision = require('@hapi/vision');
-const { home } = require("./routers/home");
-const Handlebars = require('handlebars');
-const { podcastDetails } = require("./routers/details");
-const staticFiles = require("./routers/staticFiles");
-const { admin } = require("./routers/admin/login");
-const { adminAuth } = require("./routers/admin/auth");
-const { editPodcastDetails } = require('./routers/admin/details');
+import { server as _server } from '@hapi/hapi';
+import Inert from '@hapi/inert';
+import Vision from '@hapi/vision';
+import Handlebars from "handlebars";
+
+import { home } from "./routers/home.js"
+import { podcastDetails } from "./routers/details.js";
+import { staticFiles } from './routers/staticFiles.js';
+import { admin } from './routers/admin/login.js';
+import { adminAuth } from './routers/admin/auth.js';
+import { editPodcastDetails } from './routers/admin/details.js'
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 function registerViewFunctions() {
   Handlebars.registerHelper('eq', (a, b) => a === b);
 }
 
 const init = async () => {
-  const server = Hapi.server({
+  const server = _server({
     port: 3000,
-    host: 'localhost',
+    host: '0.0.0.0',
     debug: { request: ['error'] }
   });
 
   await server.register(Inert);
   await server.register(Vision);
+
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
 
   server.views({
     engines: { html: Handlebars },

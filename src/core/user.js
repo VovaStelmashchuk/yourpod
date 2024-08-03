@@ -1,5 +1,5 @@
-const {Database} = require("./client");
-const {compareSync} = require("bcrypt");
+import { Database } from "./client.js";
+import { compareSync } from "bcrypt";
 
 function generateSessionId() {
   const count = 64;
@@ -12,8 +12,8 @@ function generateSessionId() {
   return result
 }
 
-async function addSessionToUser(username, password) {
-  const user = await Database.collection('users').findOne({username: username});
+export async function addSessionToUser(username, password) {
+  const user = await Database.collection('users').findOne({ username: username });
 
   if (!user) {
     return {
@@ -35,7 +35,7 @@ async function addSessionToUser(username, password) {
   expiresAt.setFullYear(expiresAt.getFullYear() + 1);
 
   await Database.collection('users').updateOne(
-    {username: username},
+    { username: username },
     {
       $push: {
         sessions: {
@@ -52,7 +52,7 @@ async function addSessionToUser(username, password) {
   };
 }
 
-async function getUserBySessionId(sessionId) {
+export async function getUserBySessionId(sessionId) {
   return await Database.collection('users').findOne({
     sessions: {
       $elemMatch: {
@@ -65,7 +65,3 @@ async function getUserBySessionId(sessionId) {
   });
 }
 
-module.exports = {
-  addSessionToUser,
-  getUserBySessionId
-}

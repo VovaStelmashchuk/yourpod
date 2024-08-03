@@ -1,4 +1,4 @@
-const { getAllPosts } = require("../../core/episodeRepo");
+import { getAllPosts } from "../../core/episodeRepo.js";
 
 async function dashboardView(request, h) {
   return h.view('admin/dashboard', {}, { layout: 'admin', })
@@ -22,7 +22,7 @@ async function adminPodcastList(request, h) {
   )
 }
 
-function adminDashboard(server) {
+export function adminDashboard(server) {
   server.route({
     method: 'GET',
     path: '/admin/dashboard',
@@ -42,6 +42,3 @@ function adminDashboard(server) {
   })
 }
 
-module.exports = {
-  adminDashboard
-}

@@ -1,6 +1,6 @@
-const { getPostBySlug } = require("../core/episodeRepo");
-const { buildObjectURL } = require("../minio/utils");
-const { buildPublicChapters } = require("../core/generator");
+import { getPostBySlug } from "../core/episodeRepo.js";
+import { buildObjectURL } from "../minio/utils.js";
+import { buildPublicChapters } from "../core/generator.js";
 
 async function podcastDetailsHandler(request, h) {
   const slug = request.params.slug;
@@ -21,7 +21,7 @@ async function podcastDetailsHandler(request, h) {
           return {
             time: chapter.time,
             title: chapter.description,
-            timeInSeconds: chapter.time.split(':').reduce((acc, time) => (60 * acc) + +time)
+            timeInSeconds: chapter.timeInSeconds
           }
         }
         ),
@@ -39,7 +39,7 @@ async function podcastDetailsHandler(request, h) {
   );
 }
 
-function podcastDetails(server) {
+export function podcastDetails(server) {
   server.route({
     method: 'GET',
     path: '/podcast/{slug}',
@@ -50,6 +50,3 @@ function podcastDetails(server) {
   });
 }
 
-module.exports = {
-  podcastDetails
-};

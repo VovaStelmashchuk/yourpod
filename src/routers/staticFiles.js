@@ -1,7 +1,4 @@
-'use strict';
-
-
-function staticFiles(server) {
+export function staticFiles(server) {
   server.route({
     method: 'GET',
     path: '/public/{param*}',
@@ -15,6 +12,3 @@ function staticFiles(server) {
     }
   });
 }
-
-
-module.exports = staticFiles;

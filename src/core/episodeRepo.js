@@ -1,7 +1,6 @@
-const { Database } = require("./client");
+import { Database } from "./client.js";
 
-
-function getPublicPosts() {
+export function getPublicPosts() {
   return Database.collection('posts').find(
     {
       'visibility': 'public'
@@ -14,7 +13,7 @@ function getPublicPosts() {
   ).toArray();
 }
 
-function getAllPosts() {
+export function getAllPosts() {
   return Database.collection('posts').find(
     {},
     {
@@ -25,11 +24,12 @@ function getAllPosts() {
   ).toArray();
 }
 
-function updatePodcastNameBySlug(slug, podcastName) {
+export function updatePodcastNameBySlug(slug, podcastName) {
   return Database.collection('posts').updateOne({ slug: slug }, { $set: { title: podcastName } });
 }
 
-function updateTimeCodeBySlug(slug, index, time, description, isPublicValue) {
+export function updateTimeCodeBySlug(slug, index, time, description, isPublicValue) {
+  const timeInSeconds = time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
   return Database.collection('posts').updateOne(
     { slug: slug },
     {
@@ -37,12 +37,13 @@ function updateTimeCodeBySlug(slug, index, time, description, isPublicValue) {
         [`charters.${index}.time`]: time,
         [`charters.${index}.description`]: description,
         [`charters.${index}.isPublic`]: isPublicValue,
+        [`charters.${index}.timeInSeconds`]: timeInSeconds,
       }
     }
   );
 }
 
-function updateLinkBySlug(slug, index, link, title) {
+export function updateLinkBySlug(slug, index, link, title) {
   return Database.collection('posts').updateOne(
     { slug: slug },
     {
@@ -54,15 +55,7 @@ function updateLinkBySlug(slug, index, link, title) {
   );
 }
 
-function getPostBySlug(slug) {
+export function getPostBySlug(slug) {
   return Database.collection('posts').findOne({ slug: slug });
 }
 
-module.exports = {
-  getPublicPosts,
-  getAllPosts,
-  getPostBySlug,
-  updatePodcastNameBySlug,
-  updateTimeCodeBySlug,
-  updateLinkBySlug,
-}

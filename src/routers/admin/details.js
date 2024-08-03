@@ -1,6 +1,9 @@
-const { getPostBySlug, updatePodcastNameBySlug, updateTimeCodeBySlug, updateLinkBySlug } = require("../../core/episodeRepo");
-const { buildObjectURL } = require("../../minio/utils");
-const { buildYoutubePublicDescription, buildYoutubePatreonDescription } = require("../../core/generator");
+import { updatePodcastNameBySlug } from "../../core/episodeRepo.js";
+import { adminPodcastGetInfoController } from "./detail/getDetails.js";
+import { editPodcastMetaInfo } from "./detail/edit_meta.js";
+import { getPostBySlug } from "../../core/episodeRepo.js";
+import { buildPublicChapters } from "../../core/generator.js";
+import { downloadFile } from "../../minio/utils.js";
 
 async function updatePodcastName(request, h) {
   const slug = request.params.slug;
@@ -11,127 +14,76 @@ async function updatePodcastName(request, h) {
   return h.response().code(200).header('HX-Trigger', 'update-preview');
 }
 
-async function podcastDetailsHandler(request, h) {
-  const slug = request.params.slug;
+async function buildPublicAudio(podcast) {
+  const chapters = podcast.charters;
 
-  const podcast = await getPostBySlug(slug);
+  console.log('chapters', chapters);
 
-  return h.view(
-    'admin/admin_podcast_detail',
-    {
-      title: podcast.title,
-      slug: podcast.slug,
-      audioUrl: buildObjectURL('episodes/' + podcast.audio_file_key),
-      timecodes: podcast.charters.map((chapter, index) => {
-        const splitTime = chapter.time.split(':');
-        const hour = splitTime[0];
-        const minute = splitTime[1];
-        const second = splitTime[2];
-        return {
-          slug: podcast.slug,
-          index: index,
-          description: chapter.description,
-          hour: hour,
-          minute: minute,
-          second: second,
-          isPublic: chapter.isPublic,
-        }
-      }),
-      links: podcast.links.map((link, index) => {
-        return {
-          slug: podcast.slug,
-          index: index,
-          link: link.link,
-          text: link.title,
-        }
-      })
-    },
-    { layout: 'admin' }
-  )
-}
+  //[0]atrim=start=330:end=4250[a1]; [0]atrim=start=4250:end=4800[a2]; [0]atrim=start=7800:end=11400[a3]; [a1][a2][a3]concat=n=3:v=0:a=1[out]
+  //[0]atrim=start=60:end=120[a1]; [0]atrim=start=180:end=300[a2]; [0]atrim=start=300:end=310[a3]; [a1][a2][a3]concat=n=3:v=0:a=1[out]
+  let filterString = '';
+  let publicIndex = 1;
 
-async function updateTimeCode(request, h) {
-  const { hours, minutes, seconds, text, isPublic } = request.payload;
-  // make isPublic false in case it is undefined
-  const isPublicValue = isPublic === 'on' ? true : false;
+  chapters.forEach((chapter, index) => {
+    if (chapter.isPublic !== false) {
+      const chapterStartSecond = chapter.timeInSeconds;
+      const chapterEndSecond = chapters[index + 1]?.timeInSeconds;
 
-  const slug = request.params.slug;
-  const index = request.params.index;
+      console.log('chapter name', chapter.description);
 
-  const time = `${hours}:${minutes}:${seconds}`;
+      console.log('chapterStartSecond', chapterStartSecond);
+      console.log('chapterEndSecond', chapterEndSecond);
 
-  await updateTimeCodeBySlug(slug, index, time, text, isPublicValue);
+      const filterStart = `[0]atrim=start=${chapterStartSecond}`;
 
-  return h.response().code(200).header('HX-Trigger', 'update-preview');
-}
+      let filterMainPart = ''
 
-async function updateLink(request, h) {
-  const { link, text } = request.payload;
+      if (chapterEndSecond !== undefined) {
+        filterMainPart = `${filterStart}:end=${chapterEndSecond}`;
+      } else {
+        filterMainPart = `${filterStart}`;
+      }
 
-  const slug = request.params.slug;
-  const index = request.params.index;
-
-  await updateLinkBySlug(slug, index, link, text);
-  return h.response().code(200).header('HX-Trigger', 'update-preview');
-}
-
-async function addTimeCode(request, h) {
-  const slug = request.params.slug;
-  const podcast = await getPostBySlug(slug);
-
-  const index = podcast.charters.length;
-
-  return h.view(
-    'edit_podcast_time_code_wrapper',
-    {
-      slug: slug,
-      index: index,
-    },
-    {
-      layout: false
+      filterString += `${filterMainPart},asetpts=PTS-STARTPTS[a${publicIndex}]; `;
+      publicIndex++;
     }
-  );
+  });
+
+  // add part with [a0]...[a<publicIndex>]
+  for (let i = 1; i < publicIndex; i++) {
+    filterString += `[a${i}]`;
+  }
+
+  filterString += `concat=n=${publicIndex - 1}:v=0:a=1`;
+
+  console.log('filterString', filterString);
+
+  console.log("start downoald patreon file");
+
+  const folder = 'tmp/some-test';
+
+  // download patreon file
+
+  console.log("end downoald patreon file");
 }
 
-async function addLink(request, h) {
+async function updateFiles(request, h) {
   const slug = request.params.slug;
+
   const podcast = await getPostBySlug(slug);
 
-  const index = podcast.links.length;
+  const publicChapters = buildPublicChapters(podcast.charters);
 
-  return h.view(
-    'editable_link_wrapper',
-    {
-      slug: slug,
-      index: index,
-    },
-    {
-      layout: false
-    }
-  );
+  console.log('publicChapters', publicChapters);
+
+  buildPublicAudio(podcast);
+
+  return h.response().code(200)
 }
 
-async function youtbeTextComponent(request, h) {
-  const slug = request.params.slug;
-
-  const podcast = await getPostBySlug(slug);
-  const publicDescription = buildYoutubePublicDescription(podcast);
-  const patreonDescription = buildYoutubePatreonDescription(podcast);
-
-  return h.view(
-    'admin/youtube_text',
-    {
-      slug: slug,
-      public_text: publicDescription,
-      patreon_text: patreonDescription,
-    },
-    {
-      layout: false
-    }
-  );
-}
-
-function editPodcastDetails(server) {
+export function editPodcastDetails(server) {
+  adminPodcastGetInfoController(server)
+  editPodcastMetaInfo(server)
   server.route({
     method: 'PUT',
     path: '/admin/podcast/{slug}/update-name',
@@ -142,60 +94,11 @@ function editPodcastDetails(server) {
   });
 
   server.route({
-    method: 'GET',
-    path: '/admin/podcast/{slug}',
-    handler: podcastDetailsHandler,
-    options: {
-      auth: 'adminSession',
-    }
-  });
-
-  server.route({
-    method: 'PUT',
-    path: '/admin/podcast/{slug}/timecodes/{index}',
-    handler: updateTimeCode,
-    options: {
-      auth: 'adminSession',
-    }
-  });
-
-  server.route({
-    method: 'PUT',
-    path: '/admin/podcast/{slug}/links/{index}',
-    handler: updateLink,
-    options: {
-      auth: 'adminSession',
-    }
-  });
-
-  server.route({
     method: 'POST',
-    path: '/admin/podcast/{slug}/add-timecode',
-    handler: addTimeCode,
-    options: {
-      auth: 'adminSession',
-    }
-  });
-
-  server.route({
-    method: 'POST',
-    path: '/admin/podcast/{slug}/add-link',
-    handler: addLink,
-    options: {
-      auth: 'adminSession',
-    }
-  });
-
-  server.route({
-    method: 'GET',
-    path: '/admin/podcast/{slug}/youtube-description',
-    handler: youtbeTextComponent,
+    path: '/admin/podcast/{slug}/update-files',
+    handler: updateFiles,
     options: {
       auth: 'adminSession',
     }
   });
 }
-
-module.exports = {
-  editPodcastDetails
-}; 

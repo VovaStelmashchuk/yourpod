@@ -1,14 +1,18 @@
-const {addSessionToUser} = require("../../core/user");
-const {adminDashboard} = require("./dashboard");
+import { addSessionToUser } from "../../core/user.js";
+import { adminDashboard } from "./dashboard.js";
+
+import dotenv from 'dotenv';
+dotenv.config();
+const isSecure = process.env.IS_SECURE === 'true'
 
 async function login(request, h) {
-  return h.view('admin/login', {}, {layout: 'admin'});
+  return h.view('admin/login', {}, { layout: 'admin' });
 }
 
 async function postLogin(request, h) {
-  const {username, password} = request.payload;
+  const { username, password } = request.payload;
 
-  const {sessionId, expiresAt, error} = await addSessionToUser(username, password);
+  const { sessionId, expiresAt, error } = await addSessionToUser(username, password);
 
   if (error) {
     return h
@@ -21,7 +25,7 @@ async function postLogin(request, h) {
     return h.response()
       .state('sessionId', sessionId, {
         ttl: ttl,
-        isSecure: true,
+        isSecure: isSecure,
         isHttpOnly: true,
         path: '/'
       })
@@ -30,7 +34,7 @@ async function postLogin(request, h) {
   }
 }
 
-function admin(server) {
+export function admin(server) {
   server.route({
     method: 'GET',
     path: '/login',
@@ -51,6 +55,3 @@ function admin(server) {
   adminDashboard(server);
 }
 
-module.exports = {
-  admin
-}

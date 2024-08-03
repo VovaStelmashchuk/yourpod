@@ -1,7 +1,7 @@
-const {getPublicPosts} = require("../core/episodeRepo");
+import { getPublicPosts } from "../core/episodeRepo.js";
 
 async function homeHandler(request, h) {
-  return h.view('home', {}, {layout: 'layout'});
+  return h.view('home', {}, { layout: 'layout' });
 }
 
 async function podcastListHandler(request, h) {
@@ -13,10 +13,10 @@ async function podcastListHandler(request, h) {
   }));
 
   return h.view('podcastList', {
-      posts: postsWithChartersDescription,
-    }, {
-      layout: false
-    }
+    posts: postsWithChartersDescription,
+  }, {
+    layout: false
+  }
   );
 }
 
@@ -29,8 +29,7 @@ function aboutHandler(request, h) {
   return h.response(html).type('text/html');
 }
 
-
-function home(server) {
+export function home(server) {
   server.route({
     method: 'GET',
     path: '/',
@@ -56,8 +55,3 @@ function home(server) {
     }
   });
 }
-
-
-module.exports = {
-  home
-};

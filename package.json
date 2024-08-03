@@ -1,7 +1,8 @@
 {
   "name": "yourpod",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon src/app.js",
     "build:css": "tailwindcss -i ./src/styles.css -o ./src/public/styles.css --watch"
@@ -17,12 +18,13 @@
     "@hapi/vision": "^7.0.3",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
+    "ffmpeg-static": "^5.2.0",
     "handlebars": "^4.7.8",
     "htmx": "^0.0.2",
+    "minio": "^8.0.0",
     "mongodb": "6.8",
     "podcast": "^2.0.1",
-    "translitit-cyrillic-ukrainian-to-latin": "^0.1.0",
-    "minio": "^8.0.0"
+    "translitit-cyrillic-ukrainian-to-latin": "^0.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.4",
