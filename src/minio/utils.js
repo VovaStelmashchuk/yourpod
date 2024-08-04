@@ -35,6 +35,12 @@ export async function uploadFile(key, body) {
   })
 }
 
+export async function uploadFileFromPath(key, path) {
+  await minioClient.fPutObject(bucketName, key, path, undefined, {
+    'Content-Type': 'text/xml',
+  })
+}
+
 export async function downloadFile(key, localPath) {
   await minioClient.fGetObject(bucketName, key, localPath, function(err) {
     if (err) {
