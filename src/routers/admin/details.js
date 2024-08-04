@@ -14,10 +14,10 @@ async function updatePodcastName(request, h) {
   return h.response().code(200).header('HX-Trigger', 'update-preview');
 }
 
-async function buildPublicAudio(podcast) {
+async function createPublicAudio(podcast) {
   const chapters = podcast.charters;
 
-  let filterString = '';
+  let complexFilterString = '';
   let publicIndex = 1;
 
   chapters.forEach((chapter, index) => {
@@ -35,19 +35,19 @@ async function buildPublicAudio(podcast) {
         filterMainPart = `${filterStart}`;
       }
 
-      filterString += `${filterMainPart},asetpts=PTS-STARTPTS[a${publicIndex}]; `;
+      complexFilterString += `${filterMainPart},asetpts=PTS-STARTPTS[a${publicIndex}]; `;
       publicIndex++;
     }
   });
 
   // add part with [a0]...[a<publicIndex>]
   for (let i = 1; i < publicIndex; i++) {
-    filterString += `[a${i}]`;
+    complexFilterString += `[a${i}]`;
   }
 
-  filterString += `concat=n=${publicIndex - 1}:v=0:a=1`;
+  complexFilterString += `concat=n=${publicIndex - 1}:v=0:a=1`;
 
-  await applyFFmpegToFileInMinio(podcast.origin_file, `episodes/${podcast.slug}.mp3`, filterString)
+  await applyFFmpegToFileInMinio(podcast.origin_file, `episodes/${podcast.slug}.mp3`, complexFilterString)
 }
 
 async function updateFiles(request, h) {
@@ -59,7 +59,7 @@ async function updateFiles(request, h) {
 
   console.log('publicChapters', publicChapters);
 
-  await buildPublicAudio(podcast);
+  await createPublicAudio(podcast);
 
   return h.response().code(200)
 }

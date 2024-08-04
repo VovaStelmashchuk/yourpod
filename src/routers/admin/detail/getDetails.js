@@ -12,8 +12,7 @@ async function podcastDetailsHandler(request, h) {
     {
       title: podcast.title,
       slug: podcast.slug,
-      audioUrl: buildObjectURL('patreon/' + podcast.audio_file_key),
-      audioUrl_2: buildObjectURL('episodes/' + podcast.slug + '.mp3'),
+      audioUrl: buildObjectURL(podcast.origin_file),
       timecodes: podcast.charters.map((chapter, index) => {
         const splitTime = chapter.time.split(':');
         const hour = splitTime[0];
