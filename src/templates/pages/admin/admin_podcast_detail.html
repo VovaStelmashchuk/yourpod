@@ -1,4 +1,6 @@
-<div class="p-6">
+<div class="px-6">
+  <div hx-trigger="update-progress from:body, load" hx-get="/admin/podcast/{{slug}}/progress" hx-swap="innerHTML"></div>
+
   <div>
     <label for="episode_name" class="block text-black font-medium text-2xl mb-2">Name</label>
     <input type="text" id="episode_name" name="episode_name" class="input-field w-full" placeholder="Episode name"
@@ -38,6 +40,12 @@
       Add link
     </button>
   </div>
+
+  <button hx-swap="none" hx-post="/admin/podcast/{{slug}}/update-files"
+    class="common-button w-full px-4 py-2 my-2 transition-all duration-300 ease-in-out" {{#if
+    isAudioBuildInProgress}}disabled{{/if}}>
+    Build audio files
+  </button>
 
   <h2 class="text-2xl">Preview episode</h2>
   <div class="border-2 border-black p-8 mt-2">

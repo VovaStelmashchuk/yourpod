@@ -59,3 +59,7 @@ export function getPostBySlug(slug) {
   return Database.collection('posts').findOne({ slug: slug });
 }
 
+export function updateMontageStatusBySlug(slug, status) {
+  return Database.collection('posts').updateOne({ slug: slug }, { $set: { montage_status: status } });
+}
+

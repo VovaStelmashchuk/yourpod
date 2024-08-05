@@ -25,7 +25,19 @@
   }
 
   .common-button {
-    @apply bg-transparent text-black border border-black rounded hover:bg-black hover:text-white
+    @apply bg-transparent text-black border border-black rounded;
+  }
+
+  .common-button:hover {
+    @apply bg-black text-white;
+  }
+
+  .common-button:disabled {
+    @apply bg-transparent text-gray-400 border border-black;
+  }
+
+  .common-button:disabled:hover {
+    @apply bg-transparent text-gray-400 border border-black;
   }
 }
 
@@ -39,4 +51,19 @@ html {
 
 .input-field {
   @apply rounded py-2 px-3 leading-tight
+}
+
+@keyframes progress {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+.progress-bar {
+  width: 100%;
+  animation: progress 2s infinite linear;
 }

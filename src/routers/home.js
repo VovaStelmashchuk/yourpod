@@ -8,7 +8,7 @@ async function podcastListHandler(request, h) {
   const posts = await getPublicPosts();
   const postsWithChartersDescription = posts.map(post => ({
     ...post,
-    chartersDescription: post.charters ? post.charters.map(charter => charter.description).join(' ') : '',
+   chartersDescription: post.charters ? post.charters.map(charter => charter.description).join(' ') : '',
     url: post.type === 'public' ? `/podcast/${post.slug}` : 'https://www.patreon.com/androidstory',
   }));
 

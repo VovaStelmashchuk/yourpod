@@ -35,7 +35,8 @@ async function podcastDetailsHandler(request, h) {
           link: link.link,
           text: link.title,
         }
-      })
+      }),
+      isAudioBuildInProgress: podcast.montage_status === 'in_progress',
     },
     { layout: 'admin' }
   )
