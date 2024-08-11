@@ -37,6 +37,8 @@ async function podcastDetailsHandler(request, h) {
         }
       }),
       isAudioBuildInProgress: podcast.montage_status === 'in_progress',
+      publish_button_text: podcast.visibility === 'private' ? 'Publish' : 'Unpublish',
+      url: podcast.visibility === 'private' ? `/admin/podcast/${slug}/publish` : `/admin/podcast/${slug}/unpublish`,
     },
     { layout: 'admin' }
   )

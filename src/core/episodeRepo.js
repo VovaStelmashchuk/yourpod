@@ -13,6 +13,20 @@ export function getPublicPosts() {
   ).toArray();
 }
 
+export function getPodcastForRss() {
+  return Database.collection('posts').find(
+    {
+      'visibility': 'public',
+      'type': 'public'
+    },
+    {
+      sort: {
+        'publish_date': -1
+      }
+    }
+  ).toArray();
+}
+
 export function getAllPosts() {
   return Database.collection('posts').find(
     {},
@@ -61,5 +75,13 @@ export function getPostBySlug(slug) {
 
 export function updateMontageStatusBySlug(slug, status) {
   return Database.collection('posts').updateOne({ slug: slug }, { $set: { montage_status: status } });
+}
+
+export function publishPodcast(slug) {
+  return Database.collection('posts').updateOne({ slug: slug }, { $set: { visibility: 'public' } });
+}
+
+export function unpublishPodcast(slug) {
+  return Database.collection('posts').updateOne({ slug: slug }, { $set: { visibility: 'private' } });
 }
 

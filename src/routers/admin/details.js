@@ -3,6 +3,7 @@ import { adminPodcastGetInfoController } from "./detail/getDetails.js";
 import { editPodcastMetaInfo } from "./detail/edit_meta.js";
 import { getPostBySlug } from "../../core/episodeRepo.js";
 import { createPublicAudio } from "../../montage/publicAudioGenerator.js";
+import { publishController } from "./detail/publish.js";
 
 async function updatePodcastName(request, h) {
   const slug = request.params.slug;
@@ -20,7 +21,15 @@ async function updateFiles(request, h) {
 
   await createPublicAudio(podcast);
 
-  return h.response().code(200).header('HX-Trigger', 'update-progress');
+  return h.view(
+    'buttons/build_audio',
+    {
+      isAudioBuildInProgress: true,
+    },
+    {
+      layout: false
+    }
+  ).header('HX-Trigger', 'update-progress');
 }
 
 async function getProgress(request, h) {
@@ -44,6 +53,7 @@ async function getProgress(request, h) {
 export function editPodcastDetails(server) {
   adminPodcastGetInfoController(server)
   editPodcastMetaInfo(server)
+  publishController(server)
 
   server.route({
     method: 'PUT',

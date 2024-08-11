@@ -41,11 +41,7 @@
     </button>
   </div>
 
-  <button hx-swap="none" hx-post="/admin/podcast/{{slug}}/update-files"
-    class="common-button w-full px-4 py-2 my-2 transition-all duration-300 ease-in-out" {{#if
-    isAudioBuildInProgress}}disabled{{/if}}>
-    Build audio files
-  </button>
+  {{> buttons/build_audio }}
 
   <h2 class="text-2xl">Preview episode</h2>
   <div class="border-2 border-black p-8 mt-2">
@@ -54,5 +50,9 @@
 
   <div hx-get="/admin/podcast/{{slug}}/youtube-description" hx-swap="innerHTML"
     hx-trigger="update-preview from:body, load"></div>
+
+  <div>
+    {{> buttons/publish_button}}
+  </div>
 
 </div>

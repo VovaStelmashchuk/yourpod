@@ -34,9 +34,9 @@ const init = async () => {
     engines: { html: Handlebars },
     relativeTo: __dirname,
     partialsPath: 'templates/partials',
-    path: 'templates/pages',
+    path: ['templates/pages', 'templates/partials'],
     layout: true,
-    layoutPath: 'templates/layouts'
+    layoutPath: 'templates/layouts',
   });
 
   registerViewFunctions()

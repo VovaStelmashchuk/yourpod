@@ -1,11 +1,16 @@
 import { Podcast } from 'podcast';
 
-import { getPublicPosts } from './episodeRepo.js';
+import { getPodcastForRss } from './episodeRepo.js';
 import { buildObjectURL, getFileSizeInByte, uploadFile } from '../minio/utils.js';
 
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const host = process.env.BASE_URL;
+
 export async function updateRss() {
-  const podcasts = getPublicPosts();
-  const host = config.host;
+  const podcasts = await getPodcastForRss();
   const logoUrl = buildObjectURL('logo.jpg')
 
   const description = 'Два андроїдщики, два Вови і деколи дві різні думки. Кожний подкаст ми обговорюємо нові релізи в світі android розробки, кращі і не дуже практики. Ділимося своїми думками, досвідом і деколи пробуємо не смішно жартувати. Також тут ви знайдете рекомендації початківцям, а хто давно в розробці мають тут просто гарно провести час. Якщо вам тут сподобалося то заходьте в наш telegram chat https://t.me/androidstory_chat Якщо прям сильно сподобалося закиньте там трішки грошей. https://www.patreon.com/androidstory'
@@ -57,9 +62,9 @@ export async function updateRss() {
   podcasts.forEach((post, index) => {
     let description = buildRssDescription(post);
 
-    let linkToEpisode = `${config.host}/podcast/${post.slug}`;
+    let linkToEpisode = `${host}/podcast/${post.slug}`;
 
-    let guid = post.id.toString();
+    let guid = post._id.toString();
 
     let date = post.publish_date.toISOString();
 
@@ -87,7 +92,9 @@ export async function updateRss() {
     });
   });
 
-  await uploadFile('rss_1.xml', feed.buildXml());
+  const xml = feed.buildXml();
+
+  await uploadFile('rss.xml', xml);
 }
 
 export function buildPublicChapters(chapters) {
@@ -122,7 +129,7 @@ function buildRssDescription(post) {
     const publicChapters = buildPublicChapters(post.charters);
     description += '<ul>'
     publicChapters
-      .filter(chapter => chapter.isPublic)
+      .filter(chapter => chapter.isPublic !== false)
       .forEach(chapter => {
         description += `<li>${chapter.time} - <em>${chapter.description}</em></li>`;
       });

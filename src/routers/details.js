@@ -23,15 +23,14 @@ async function podcastDetailsHandler(request, h) {
             title: chapter.description,
             timeInSeconds: chapter.timeInSeconds
           }
-        }
-        ),
-      links: podcast.links.map(link => {
-        return {
-          link: link.link,
-          title: link.title,
-        }
-      }
-      )
+        }),
+      links: podcast.links
+        .map(link => {
+          return {
+            link: link.link,
+            title: link.title,
+          }
+        }),
     },
     {
       layout: layout
