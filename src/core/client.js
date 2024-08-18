@@ -16,4 +16,3 @@ client.connect()
 
 export const Database = client.db('story-podcast-app')
 
-

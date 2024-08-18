@@ -110,7 +110,7 @@ export function buildPublicChapters(chapters) {
       adjustedChapters.push({
         time: new Date(adjustedTimeInSeconds * 1000).toISOString().substr(11, 8),
         description: chapter.description,
-        timeInSeconds: chapter.timeInSeconds,
+        timeInSeconds: chapter.timeInSeconds - totalPrivateChaptersTime,
       });
     } else {
       const nextChapterTime = chapters[index + 1]?.time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
