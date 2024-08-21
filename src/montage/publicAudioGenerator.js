@@ -1,4 +1,4 @@
-import { updateMontageStatusBySlug } from '../core/episodeRepo.js';
+import { updateMontageStatusBySlug, updateMontageStatusToSuccessBySlug } from '../core/episodeRepo.js';
 import { applyFFmpegToFileInMinio } from '../minio/ffmpegApply.js';
 
 async function createPublicAudioJob(podcast) {
@@ -42,7 +42,7 @@ export async function createPublicAudio(podcast) {
 
   createPublicAudioJob(podcast)
     .then(async () => {
-      await modifyPodcastStatus(podcast.slug, 'success');
+      await updateMontageStatusToSuccessBySlug(podcast.slug, `episodes/${podcast.slug}.mp3`);
       console.log('Public audio creation successful.');
     })
     .catch(async (error) => {

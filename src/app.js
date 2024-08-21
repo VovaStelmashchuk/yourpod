@@ -33,8 +33,8 @@ const init = async () => {
   server.views({
     engines: { html: Handlebars },
     relativeTo: __dirname,
-    partialsPath: 'templates/partials',
-    path: ['templates/pages', 'templates/partials'],
+    partialsPath: ['templates/partials', 'templates/widgets'],
+    path: ['templates/pages', 'templates/partials', 'templates/widgets'],
     layout: true,
     layoutPath: 'templates/layouts',
   });

@@ -1,14 +1,23 @@
 import { getPublicPosts } from "../core/episodeRepo.js";
+import { getShowInfo } from "../core/podcastRepo.js";
 
 async function homeHandler(request, h) {
-  return h.view('home', {}, { layout: 'layout' });
+  const host = request.headers.host;
+  const showInfo = await getShowInfo(host)
+
+  return h.view('home', {
+    showName: showInfo.showName,
+    header_links: showInfo.links,
+  }, {
+    layout: 'layout'
+  });
 }
 
 async function podcastListHandler(request, h) {
   const posts = await getPublicPosts();
   const postsWithChartersDescription = posts.map(post => ({
     ...post,
-   chartersDescription: post.charters ? post.charters.map(charter => charter.description).join(' ') : '',
+    chartersDescription: post.charters ? post.charters.map(charter => charter.description).join(' ') : '',
     url: post.type === 'public' ? `/podcast/${post.slug}` : 'https://www.patreon.com/androidstory',
   }));
 
@@ -20,13 +29,15 @@ async function podcastListHandler(request, h) {
   );
 }
 
-function aboutHandler(request, h) {
-  const html = `
-        <div id="tab-content" role="tabpanel" class="tab-content">
-            <p class="text-xl">Двa андроїдщики, два Вови і деколи дві різні думки. Кожний подкаст ми обговорюємо нові релізи в світі android розробки, кращі і не дуже практики. Ділимося своїми думками, досвідом і деколи пробуємо не смішно жатрувати. Також тут ви знайдете рекомендації початківцям, а хто давно в розробці мають тут просто гарно провести час.</p>
-        </div>
-      `;
-  return h.response(html).type('text/html');
+async function aboutHandler(request, h) {
+  const host = request.headers.host;
+  const show = await getShowInfo(host)
+
+  return h.view('about', {
+    about: show.about,
+  }, {
+    layout: false
+  });
 }
 
 export function home(server) {

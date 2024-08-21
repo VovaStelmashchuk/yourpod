@@ -77,6 +77,10 @@ export function updateMontageStatusBySlug(slug, status) {
   return Database.collection('posts').updateOne({ slug: slug }, { $set: { montage_status: status } });
 }
 
+export function updateMontageStatusToSuccessBySlug(slug, audioFileKey) {
+  return Database.collection('posts').updateOne({ slug: slug }, { $set: { montage_status: 'success', audio_file_key: audioFileKey } });
+}
+
 export function publishPodcast(slug) {
   return Database.collection('posts').updateOne({ slug: slug }, { $set: { visibility: 'public' } });
 }

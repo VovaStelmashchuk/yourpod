@@ -1,8 +1,12 @@
 import { getPostBySlug } from "../core/episodeRepo.js";
 import { buildObjectURL } from "../minio/utils.js";
 import { buildPublicChapters } from "../core/generator.js";
+import { getShowInfo } from "../core/podcastRepo.js";
 
 async function podcastDetailsHandler(request, h) {
+  const host = request.headers.host;
+  const showInfo = await getShowInfo(host)
+
   const slug = request.params.slug;
   const preview = request.query.preview;
 
@@ -14,6 +18,8 @@ async function podcastDetailsHandler(request, h) {
 
   return h.view('podcastDetails',
     {
+      showName: showInfo.showName,
+      header_links: showInfo.links,
       title: podcast.title,
       audioUrl: buildObjectURL('episodes/' + podcast.audio_file_key),
       chapters: publicChapters
