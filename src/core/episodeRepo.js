@@ -1,9 +1,10 @@
 import { Database } from "./client.js";
 
-export function getPublicPosts() {
+export function getPublicPosts(showSlug) {
   return Database.collection('posts').find(
     {
-      'visibility': 'public'
+      'visibility': 'public',
+      'showSlug': showSlug
     },
     {
       sort: {
@@ -27,9 +28,11 @@ export function getPodcastForRss() {
   ).toArray();
 }
 
-export function getAllPosts() {
+export function getAllPosts(showSlug) {
   return Database.collection('posts').find(
-    {},
+    {
+      'showSlug': showSlug
+    },
     {
       sort: {
         'publish_date': -1
@@ -38,14 +41,22 @@ export function getAllPosts() {
   ).toArray();
 }
 
-export function updatePodcastNameBySlug(slug, podcastName) {
-  return Database.collection('posts').updateOne({ slug: slug }, { $set: { title: podcastName } });
+export function updatePodcastNameBySlug(showSlug, episodeSlug, podcastName) {
+  return Database.collection('posts').updateOne({
+    showSlug: showSlug,
+    slug: episodeSlug
+  }, {
+    $set: { title: podcastName }
+  });
 }
 
-export function updateTimeCodeBySlug(slug, index, time, description, isPublicValue) {
+export function updateTimeCodeBySlug(showSlug, episodeSlug, index, time, description, isPublicValue) {
   const timeInSeconds = time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
   return Database.collection('posts').updateOne(
-    { slug: slug },
+    {
+      showSlug: showSlug,
+      slug: episodeSlug
+    },
     {
       $set: {
         [`charters.${index}.time`]: time,
@@ -69,16 +80,16 @@ export function updateLinkBySlug(slug, index, link, title) {
   );
 }
 
-export function getPostBySlug(slug) {
-  return Database.collection('posts').findOne({ slug: slug });
+export function getPostBySlug(showSlug, episodeSlug) {
+  return Database.collection('posts').findOne({ slug: episodeSlug, showSlug: showSlug });
 }
 
 export function updateMontageStatusBySlug(slug, status) {
   return Database.collection('posts').updateOne({ slug: slug }, { $set: { montage_status: status } });
 }
 
-export function updateMontageStatusToSuccessBySlug(slug, audioFileKey) {
-  return Database.collection('posts').updateOne({ slug: slug }, { $set: { montage_status: 'success', audio_file_key: audioFileKey } });
+export function updateMontageStatusToSuccessBySlug(slug, publicAudioFile) {
+  return Database.collection('posts').updateOne({ slug: slug }, { $set: { montage_status: 'success', publicAudioFile: publicAudioFile } });
 }
 
 export function publishPodcast(slug) {

@@ -1,24 +1,47 @@
 import { getAllPosts } from "../../core/episodeRepo.js";
+import { getAllShows, getShowBySlug } from "../../core/showRepo.js";
 
 async function dashboardView(request, h) {
-  return h.view('admin/dashboard', {}, { layout: 'admin', })
+  const shows = await getAllShows();
+  const showsUiModel = shows.map(show => ({
+    url: `/admin/show/${show.slug}`,
+    showName: show.showName,
+  }));
+
+  return h.view(
+    'admin/dashboard',
+    {
+      pageTitle: 'Dashboard',
+      shows: showsUiModel,
+    },
+    {
+      layout: 'admin'
+    }
+  )
 }
 
 async function adminPodcastList(request, h) {
-  const posts = await getAllPosts()
+  const showSlug = request.params.showSlug;
+
+  const show = await getShowBySlug(showSlug);
+  const posts = await getAllPosts(showSlug);
 
   const uiPosts = posts.map(post => ({
     ...post,
-    detailUrl: `/admin/podcast/${post.slug}`,
+    detailUrl: `/admin/show/${show.slug}/episode/${post.slug}`,
   }));
+
+  const pageTitle = 'Dashboard ' + show.showName;
 
   return h.view(
     'admin/admin_podcast_list',
     {
+      pageTitle: pageTitle,
       posts: uiPosts,
-    }, {
-    layout: false,
-  }
+    },
+    {
+      layout: 'admin'
+    }
   )
 }
 
@@ -34,7 +57,7 @@ export function adminDashboard(server) {
 
   server.route({
     method: 'GET',
-    path: '/admin/podcast',
+    path: '/admin/show/{showSlug}',
     handler: adminPodcastList,
     options: {
       auth: 'adminSession',

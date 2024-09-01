@@ -2,6 +2,7 @@ import { Podcast } from 'podcast';
 
 import { getPodcastForRss } from './episodeRepo.js';
 import { buildObjectURL, getFileSizeInByte, uploadFile } from '../minio/utils.js';
+import { getShowInfo } from '../core/podcastRepo.js';
 
 import dotenv from 'dotenv';
 
@@ -9,26 +10,27 @@ dotenv.config();
 
 const host = process.env.BASE_URL;
 
-export async function updateRss() {
+export async function updateRss(showSlug) {
   const podcasts = await getPodcastForRss();
-  const logoUrl = buildObjectURL('logo.jpg')
+  const logoUrl = buildObjectURL(showSlug + '/logo.jpg')
 
-  const description = 'Два андроїдщики, два Вови і деколи дві різні думки. Кожний подкаст ми обговорюємо нові релізи в світі android розробки, кращі і не дуже практики. Ділимося своїми думками, досвідом і деколи пробуємо не смішно жартувати. Також тут ви знайдете рекомендації початківцям, а хто давно в розробці мають тут просто гарно провести час. Якщо вам тут сподобалося то заходьте в наш telegram chat https://t.me/androidstory_chat Якщо прям сильно сподобалося закиньте там трішки грошей. https://www.patreon.com/androidstory'
+  const showInfo = await getShowInfo(showSlug);
+  const description = showInfo.about;
 
-  const author = 'Vova and Vova';
+  const author = showInfo.authors;
 
   const pubDate = new Date().toUTCString();
 
   const feed = new Podcast({
-    title: 'Android story',
+    title: showInfo.showName,
     description: description,
-    feedUrl: buildObjectURL('rss.xml'),
+    feedUrl: buildObjectURL(showSlug + '/rss.xml'),
     siteUrl: host,
     webMaster: host,
     generator: 'Android story',
     imageUrl: logoUrl,
     author: author,
-    copyright: '© 2022 Android story',
+    copyright: '© 20220-2024' + showInfo.showName,
     language: 'ua',
     categories: ['Technology'],
     pubDate: pubDate,
@@ -50,11 +52,11 @@ export async function updateRss() {
   });
 
   const fileSizes = await Promise.all(podcasts.map(post =>
-    getFileSizeInByte('episodes/' + post.audio_file_key)
+    getFileSizeInByte(post.publicAudioFile)
   ));
 
   const podcastsUrl = await Promise.all(podcasts.map(post =>
-    buildObjectURL('episodes/' + post.audio_file_key)
+    buildObjectURL(post.publicAudioFile)
   ));
 
   const podcastCount = podcasts.length;
@@ -94,7 +96,7 @@ export async function updateRss() {
 
   const xml = feed.buildXml();
 
-  await uploadFile('rss.xml', xml);
+  await uploadFile(showSlug + '/rss.xml', xml);
 }
 
 export function buildPublicChapters(chapters) {

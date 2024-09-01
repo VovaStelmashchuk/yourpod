@@ -1,15 +1,17 @@
 import { getPostBySlug, updateTimeCodeBySlug, updateLinkBySlug } from "../../../core/episodeRepo.js";
 
 async function updateTimeCode(request, h) {
+  const showSlug = request.params.showSlug;
+  const episodeSlug = request.params.episodeSlug;
+  
   const { hours, minutes, seconds, text, isPublic } = request.payload;
   const isPublicValue = isPublic === 'on' ? true : false;
 
-  const slug = request.params.slug;
   const index = request.params.index;
 
   const time = `${hours}:${minutes}:${seconds}`;
 
-  await updateTimeCodeBySlug(slug, index, time, text, isPublicValue);
+  await updateTimeCodeBySlug(showSlug, episodeSlug, index, time, text, isPublicValue);
 
   return h.response().code(200).header('HX-Trigger', 'update-preview');
 }
@@ -25,15 +27,18 @@ async function updateLink(request, h) {
 }
 
 async function addTimeCode(request, h) {
-  const slug = request.params.slug;
-  const podcast = await getPostBySlug(slug);
+  const showSlug = request.params.showSlug;
+  const episodeSlug = request.params.episodeSlug;
+
+  const podcast = await getPostBySlug(showSlug, episodeSlug);
 
   const index = podcast.charters.length;
 
   return h.view(
-    'edit_podcast_time_code_wrapper',
+    'editable_time_code',
     {
-      slug: slug,
+      showSlug: showSlug,
+      episodeSlug: episodeSlug,
       index: index,
     },
     {
@@ -49,7 +54,7 @@ async function addLink(request, h) {
   const index = podcast.links.length;
 
   return h.view(
-    'editable_link_wrapper',
+    'editable_link',
     {
       slug: slug,
       index: index,
@@ -63,7 +68,7 @@ async function addLink(request, h) {
 export function editPodcastMetaInfo(server) {
   server.route({
     method: 'PUT',
-    path: '/admin/podcast/{slug}/timecodes/{index}',
+    path: '/admin/show/{showSlug}/episode/{episodeSlug}/timecodes/{index}',
     handler: updateTimeCode,
     options: {
       auth: 'adminSession',
@@ -72,7 +77,7 @@ export function editPodcastMetaInfo(server) {
 
   server.route({
     method: 'POST',
-    path: '/admin/podcast/{slug}/add-timecode',
+    path: '/admin/show/{showSlug}/episode/{episodeSlug}/add-timecode',
     handler: addTimeCode,
     options: {
       auth: 'adminSession',

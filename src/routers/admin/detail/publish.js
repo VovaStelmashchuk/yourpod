@@ -5,7 +5,7 @@ async function publishHandler(request, h) {
   const slug = request.params.slug;
   await publishPodcast(slug)
 
-  await updateRss();
+  await updateRss('android-story');
 
   return h.view(
     'buttons/publish_button',
@@ -23,7 +23,7 @@ async function unpublishHandler(request, h) {
   const slug = request.params.slug;
   await unpublishPodcast(slug)
 
-  await updateRss();
+  await updateRss('android-story');
 
   return h.view(
     'buttons/publish_button',

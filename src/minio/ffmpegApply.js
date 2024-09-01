@@ -8,7 +8,7 @@ import Fs from 'fs'
  * The method downoald file from minio and apply ffmpeg to it and upload to minio
  */
 export async function applyFFmpegToFileInMinio(inputKey, outputKey, ffmpegCommand) {
-  console.log('Applying ffmpeg to file in minio');
+  console.log('Applying ffmpeg to file in minio, start download');
   const folder = `.tmp/test-key/`;
   Fs.rmSync(folder, { recursive: true, force: true });
 

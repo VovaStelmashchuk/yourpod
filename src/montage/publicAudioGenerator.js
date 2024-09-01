@@ -34,7 +34,7 @@ async function createPublicAudioJob(podcast) {
 
   complexFilterString += `concat=n=${publicIndex - 1}:v=0:a=1`;
 
-  await applyFFmpegToFileInMinio(podcast.origin_file, `episodes/${podcast.slug}.mp3`, complexFilterString)
+  await applyFFmpegToFileInMinio(podcast.originFilePath, podcast.publicAudioFile, complexFilterString)
 }
 
 export async function createPublicAudio(podcast) {
@@ -42,7 +42,8 @@ export async function createPublicAudio(podcast) {
 
   createPublicAudioJob(podcast)
     .then(async () => {
-      await updateMontageStatusToSuccessBySlug(podcast.slug, `episodes/${podcast.slug}.mp3`);
+      const publicAudioPath = `${podcast.showSlug}/episodes/${podcast.slug}`;
+      await updateMontageStatusToSuccessBySlug(podcast.slug, publicAudioPath);
       console.log('Public audio creation successful.');
     })
     .catch(async (error) => {

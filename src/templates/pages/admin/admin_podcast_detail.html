@@ -1,10 +1,11 @@
 <div class="px-6">
-  <div hx-trigger="update-progress from:body, load" hx-get="/admin/podcast/{{slug}}/progress" hx-swap="innerHTML"></div>
+  <div hx-trigger="update-progress from:body, load" hx-get="/admin/show/{{showSlug}}/episode/{{episodeSlug}}/progress"
+    hx-swap="innerHTML"></div>
 
   <div>
     <label for="episode_name" class="block text-black font-medium text-2xl mb-2">Name</label>
     <input type="text" id="episode_name" name="episode_name" class="input-field w-full" placeholder="Episode name"
-      value="{{title}}" hx-put="/admin/podcast/{{slug}}/update-name" hx-trigger="keyup changed delay:500ms"
+      value="{{title}}" hx-put="/admin/show/{{showSlug}}/episode/{{episodeSlug}}/update-name" hx-trigger="keyup changed delay:500ms"
       hx-include="[name=episode_name]" hx-swap="none">
   </div>
 
@@ -23,7 +24,7 @@
       {{> editable_time_code}}
       {{/each}}
     </div>
-    <button hx-target="#timecodes-list" hx-swap="beforeend" hx-post="/admin/podcast/{{slug}}/add-timecode"
+    <button hx-target="#timecodes-list" hx-swap="beforeend" hx-post="/admin/show/{{showSlug}}/episode/{{episodeSlug}}/add-timecode"
       class="common-button w-full px-4 py-2 my-2">
       Add time code
     </button>
@@ -35,7 +36,7 @@
       {{> editable_link}}
       {{/each}}
     </div>
-    <button hx-target="#links-list" hx-swap="beforeend" hx-post="/admin/podcast/{{slug}}/add-link"
+    <button hx-target="#links-list" hx-swap="beforeend" hx-post="/admin/show/{{showSlug}}/episode/{{episodeSlug}}/add-link"
       class="common-button w-full px-4 py-2 my-2">
       Add link
     </button>
@@ -45,10 +46,11 @@
 
   <h2 class="text-2xl">Preview episode</h2>
   <div class="border-2 border-black p-8 mt-2">
-    <div hx-get="/podcast/{{slug}}?preview=true" hx-swap="innerHTML" hx-trigger="update-preview from:body, load"></div>
+    <div hx-get="/admin/preview/show/{{showSlug}}/episode/{{episodeSlug}}" hx-swap="innerHTML"
+      hx-trigger="update-preview from:body, load"></div>
   </div>
 
-  <div hx-get="/admin/podcast/{{slug}}/youtube-description" hx-swap="innerHTML"
+  <div hx-get="/admin/show/{{showSlug}}/episode/{{episodeSlug}}/youtube-description" hx-swap="innerHTML"
     hx-trigger="update-preview from:body, load"></div>
 
   <div>

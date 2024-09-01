@@ -14,7 +14,9 @@ async function homeHandler(request, h) {
 }
 
 async function podcastListHandler(request, h) {
-  const posts = await getPublicPosts();
+  const host = request.headers.host;
+  const showInfo = await getShowInfo(host)
+  const posts = await getPublicPosts(showInfo.slug);
   const postsWithChartersDescription = posts.map(post => ({
     ...post,
     chartersDescription: post.charters ? post.charters.map(charter => charter.description).join(' ') : '',

@@ -4,12 +4,14 @@ import { editPodcastMetaInfo } from "./detail/edit_meta.js";
 import { getPostBySlug } from "../../core/episodeRepo.js";
 import { createPublicAudio } from "../../montage/publicAudioGenerator.js";
 import { publishController } from "./detail/publish.js";
+import { podcastPreview } from "./preview.js";
 
 async function updatePodcastName(request, h) {
-  const slug = request.params.slug;
+  const episodeSlug = request.params.episodeSlug;
+  const showSlug = request.params.showSlug;
   const newName = request.payload.episode_name;
 
-  await updatePodcastNameBySlug(slug, newName);
+  await updatePodcastNameBySlug(showSlug, episodeSlug, newName);
 
   return h.response().code(200).header('HX-Trigger', 'update-preview');
 }
@@ -33,9 +35,10 @@ async function updateFiles(request, h) {
 }
 
 async function getProgress(request, h) {
-  const slug = request.params.slug;
+  const showSlug = request.params.showSlug;
+  const episodeSlug = request.params.episodeSlug;
 
-  const podcast = await getPostBySlug(slug);
+  const podcast = await getPostBySlug(showSlug, episodeSlug);
 
   if (podcast.montage_status === 'in_progress') {
     return h.view(
@@ -54,10 +57,11 @@ export function editPodcastDetails(server) {
   adminPodcastGetInfoController(server)
   editPodcastMetaInfo(server)
   publishController(server)
+  podcastPreview(server)
 
   server.route({
     method: 'PUT',
-    path: '/admin/podcast/{slug}/update-name',
+    path: '/admin/show/{showSlug}/episode/{episodeSlug}/update-name',
     handler: updatePodcastName,
     options: {
       auth: 'adminSession',
@@ -75,7 +79,7 @@ export function editPodcastDetails(server) {
 
   server.route({
     method: 'GET',
-    path: '/admin/podcast/{slug}/progress',
+    path: '/admin/show/{showSlug}/episode/{episodeSlug}/progress',
     handler: getProgress,
     options: {
       auth: 'adminSession',

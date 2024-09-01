@@ -2,17 +2,20 @@ import { getPostBySlug } from "../../../core/episodeRepo.js";
 import { buildObjectURL } from "../../../minio/utils.js";
 import { buildYoutubePublicDescription, buildYoutubePatreonDescription } from "../../../core/generator.js";
 
-async function podcastDetailsHandler(request, h) {
-  const slug = request.params.slug;
+async function getPodcastDetails(request, h) {
+  const showSlug = request.params.showSlug;
+  const episodeSlug = request.params.episodeSlug;
 
-  const podcast = await getPostBySlug(slug);
+  const podcast = await getPostBySlug(showSlug, episodeSlug);
 
   return h.view(
     'admin/admin_podcast_detail',
     {
       title: podcast.title,
       slug: podcast.slug,
-      audioUrl: buildObjectURL(podcast.origin_file),
+      showSlug: showSlug,
+      episodeSlug: podcast.slug,
+      audioUrl: buildObjectURL(podcast.originFilePath),
       timecodes: podcast.charters.map((chapter, index) => {
         const splitTime = chapter.time.split(':');
         const hour = splitTime[0];
@@ -38,23 +41,23 @@ async function podcastDetailsHandler(request, h) {
       }),
       isAudioBuildInProgress: podcast.montage_status === 'in_progress',
       publish_button_text: podcast.visibility === 'private' ? 'Publish' : 'Unpublish',
-      url: podcast.visibility === 'private' ? `/admin/podcast/${slug}/publish` : `/admin/podcast/${slug}/unpublish`,
+      url: podcast.visibility === 'private' ? `/admin/podcast/${episodeSlug}/publish` : `/admin/podcast/${episodeSlug}/unpublish`,
     },
     { layout: 'admin' }
   )
 }
 
 async function youtbeTextComponent(request, h) {
-  const slug = request.params.slug;
+  const showSlug = request.params.showSlug;
+  const episodeSlug = request.params.episodeSlug;
 
-  const podcast = await getPostBySlug(slug);
+  const podcast = await getPostBySlug(showSlug, episodeSlug);
   const publicDescription = buildYoutubePublicDescription(podcast);
   const patreonDescription = buildYoutubePatreonDescription(podcast);
 
   return h.view(
     'admin/youtube_text',
     {
-      slug: slug,
       public_text: publicDescription,
       patreon_text: patreonDescription,
     },
@@ -67,8 +70,8 @@ async function youtbeTextComponent(request, h) {
 export function adminPodcastGetInfoController(server) {
   server.route({
     method: 'GET',
-    path: '/admin/podcast/{slug}',
-    handler: podcastDetailsHandler,
+    path: '/admin/show/{showSlug}/episode/{episodeSlug}',
+    handler: getPodcastDetails,
     options: {
       auth: 'adminSession',
     }
@@ -76,7 +79,7 @@ export function adminPodcastGetInfoController(server) {
 
   server.route({
     method: 'GET',
-    path: '/admin/podcast/{slug}/youtube-description',
+    path: '/admin/show/{showSlug}/episode/{episodeSlug}/youtube-description',
     handler: youtbeTextComponent,
     options: {
       auth: 'adminSession',

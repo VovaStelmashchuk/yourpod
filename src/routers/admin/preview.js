@@ -1,22 +1,16 @@
-import { getPostBySlug } from "../core/episodeRepo.js";
-import { buildObjectURL } from "../minio/utils.js";
-import { buildPublicChapters } from "../core/generator.js";
-import { getShowInfo } from "../core/podcastRepo.js";
+import { getPostBySlug } from "../../core/episodeRepo.js";
+import { buildObjectURL } from "../../minio/utils.js";
+import { buildPublicChapters } from "../../core/generator.js";
 
 async function podcastDetailsHandler(request, h) {
-  const host = request.headers.host;
-  const showInfo = await getShowInfo(host)
+  const showSlug = request.params.showSlug;
+  const episodeSlug = request.params.episodeSlug;
 
-  const slug = request.params.slug;
-
-  const podcast = await getPostBySlug(showInfo.slug, slug);
-
+  const podcast = await getPostBySlug(showSlug, episodeSlug);
   const publicChapters = buildPublicChapters(podcast.charters)
 
   return h.view('podcastDetails',
     {
-      showName: showInfo.showName,
-      header_links: showInfo.links,
       title: podcast.title,
       audioUrl: buildObjectURL(podcast.publicAudioFile),
       chapters: publicChapters
@@ -36,19 +30,18 @@ async function podcastDetailsHandler(request, h) {
         }),
     },
     {
-      layout: 'layout',
+      layout: false,
     }
   );
 }
 
-export function podcastDetails(server) {
+export function podcastPreview(server) {
   server.route({
     method: 'GET',
-    path: '/podcast/{slug}',
+    path: '/admin/preview/show/{showSlug}/episode/{episodeSlug}',
     handler: podcastDetailsHandler,
     options: {
       auth: false
     }
   });
 }
-
