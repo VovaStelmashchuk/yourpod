@@ -22,7 +22,8 @@ async function getPodcastDetails(request, h) {
         const minute = splitTime[1];
         const second = splitTime[2];
         return {
-          slug: podcast.slug,
+          showSlug: podcast.showSlug,
+          episodeSlug: podcast.slug,
           index: index,
           description: chapter.description,
           hour: hour,
@@ -33,7 +34,8 @@ async function getPodcastDetails(request, h) {
       }),
       links: podcast.links.map((link, index) => {
         return {
-          slug: podcast.slug,
+          showSlug: podcast.showSlug,
+          episodeSlug: podcast.slug,
           index: index,
           link: link.link,
           text: link.title,
@@ -41,7 +43,7 @@ async function getPodcastDetails(request, h) {
       }),
       isAudioBuildInProgress: podcast.montage_status === 'in_progress',
       publish_button_text: podcast.visibility === 'private' ? 'Publish' : 'Unpublish',
-      url: podcast.visibility === 'private' ? `/admin/podcast/${episodeSlug}/publish` : `/admin/podcast/${episodeSlug}/unpublish`,
+      url: podcast.visibility === 'private' ? `/admin/show/${podcast.showSlug}/episode/${podcast.slug}/publish` : `/admin/show/${podcast.showSlug}/episode/${podcast.slug}/unpublish`,
     },
     { layout: 'admin' }
   )

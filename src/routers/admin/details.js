@@ -17,9 +17,10 @@ async function updatePodcastName(request, h) {
 }
 
 async function updateFiles(request, h) {
-  const slug = request.params.slug;
+  const showSlug = request.params.showSlug;
+  const episodeSlug = request.params.episodeSlug;
 
-  const podcast = await getPostBySlug(slug);
+  const podcast = await getPostBySlug(showSlug, episodeSlug);
 
   await createPublicAudio(podcast);
 
@@ -70,7 +71,7 @@ export function editPodcastDetails(server) {
 
   server.route({
     method: 'POST',
-    path: '/admin/podcast/{slug}/update-files',
+    path: '/admin/show/{showSlug}/episode/{episodeSlug}/update-files',
     handler: updateFiles,
     options: {
       auth: 'adminSession',

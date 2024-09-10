@@ -19,6 +19,7 @@ async function podcastDetailsHandler(request, h) {
       header_links: showInfo.links,
       title: podcast.title,
       audioUrl: buildObjectURL(podcast.publicAudioFile),
+      imageUrl: `https://your-pod-cdn.vovastelmashchuk.site/${showInfo.slug}/logo.jpg`,
       chapters: publicChapters
         .map(chapter => {
           return {

@@ -9,6 +9,10 @@ import Fs from 'fs'
  */
 export async function applyFFmpegToFileInMinio(inputKey, outputKey, ffmpegCommand) {
   console.log('Applying ffmpeg to file in minio, start download');
+  console.log('inputKey', inputKey);
+  console.log('outputKey', outputKey);
+  console.log('ffmpegCommand', ffmpegCommand);
+
   const folder = `.tmp/test-key/`;
   Fs.rmSync(folder, { recursive: true, force: true });
 

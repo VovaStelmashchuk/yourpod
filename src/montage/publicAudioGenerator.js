@@ -1,4 +1,4 @@
-import { updateMontageStatusBySlug, updateMontageStatusToSuccessBySlug } from '../core/episodeRepo.js';
+import { updateMontageStatusBySlug, updatePublicAudio } from '../core/episodeRepo.js';
 import { applyFFmpegToFileInMinio } from '../minio/ffmpegApply.js';
 
 async function createPublicAudioJob(podcast) {
@@ -38,12 +38,13 @@ async function createPublicAudioJob(podcast) {
 }
 
 export async function createPublicAudio(podcast) {
+  const publicAudioPath = `${podcast.showSlug}/episodes/${podcast.slug}.mp3`;
+  await updatePublicAudio(podcast.showSlug, podcast.slug, publicAudioPath);
   await modifyPodcastStatus(podcast.slug, 'in_progress');
 
   createPublicAudioJob(podcast)
     .then(async () => {
-      const publicAudioPath = `${podcast.showSlug}/episodes/${podcast.slug}`;
-      await updateMontageStatusToSuccessBySlug(podcast.slug, publicAudioPath);
+      await modifyPodcastStatus(podcast.slug, 'in_progress');
       console.log('Public audio creation successful.');
     })
     .catch(async (error) => {
@@ -54,8 +55,8 @@ export async function createPublicAudio(podcast) {
   return { status: 'in-progress' };
 }
 
-async function modifyPodcastStatus(slug, status) {
-  updateMontageStatusBySlug(slug, status);
-  console.log(`Updating podcast status to ${status} for ${slug}`);
+async function modifyPodcastStatus(showSlug, episodeSlug, status) {
+  updateMontageStatusBySlug(showSlug, episodeSlug, status);
+  console.log(`Updating podcast status to ${status} for ${episodeSlug}, show ${showSlug}`);
 }
 

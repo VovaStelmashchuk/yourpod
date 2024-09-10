@@ -1,9 +1,9 @@
 <div class="link-entry w-full mx-auto flex space-x-2">
   <input value="{{text}}" name="text" placeholder="text" hx-trigger="keyup changed delay:500ms"
-    hx-put="/admin/podcast/{{slug}}/links/{{index}}" hx-swap="none" hx-include="closest .link-entry"
+    hx-put="/admin/show/{{showSlug}}/episode/{{episodeSlug}}/links/{{index}}" hx-swap="none" hx-include="closest .link-entry"
     class="w-1/2 px-2 py-1 border rounded">
 
   <input value="{{link}}" name="link" placeholder="link" hx-trigger="keyup changed delay:500ms"
-    hx-put="/admin/podcast/{{slug}}/links/{{index}}" hx-swap="none" hx-include="closest .link-entry"
+    hx-put="/admin/show/{{showSlug}}/episode/{episodeSlug}/links/{{index}}" hx-swap="none" hx-include="closest .link-entry"
     class="w-1/2 px-2 py-1 border rounded">
 </div>

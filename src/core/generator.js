@@ -2,7 +2,7 @@ import { Podcast } from 'podcast';
 
 import { getPodcastForRss } from './episodeRepo.js';
 import { buildObjectURL, getFileSizeInByte, uploadFile } from '../minio/utils.js';
-import { getShowInfo } from '../core/podcastRepo.js';
+import { getShowBySlug } from '../core/podcastRepo.js';
 
 import dotenv from 'dotenv';
 
@@ -11,10 +11,11 @@ dotenv.config();
 const host = process.env.BASE_URL;
 
 export async function updateRss(showSlug) {
-  const podcasts = await getPodcastForRss();
+  const podcasts = await getPodcastForRss(showSlug);
   const logoUrl = buildObjectURL(showSlug + '/logo.jpg')
 
-  const showInfo = await getShowInfo(showSlug);
+  const showInfo = await getShowBySlug(showSlug);
+
   const description = showInfo.about;
 
   const author = showInfo.authors;

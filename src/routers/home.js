@@ -15,12 +15,13 @@ async function homeHandler(request, h) {
 
 async function podcastListHandler(request, h) {
   const host = request.headers.host;
-  const showInfo = await getShowInfo(host)
+  const showInfo = await getShowInfo(host);
   const posts = await getPublicPosts(showInfo.slug);
   const postsWithChartersDescription = posts.map(post => ({
     ...post,
     chartersDescription: post.charters ? post.charters.map(charter => charter.description).join(' ') : '',
     url: post.type === 'public' ? `/podcast/${post.slug}` : 'https://www.patreon.com/androidstory',
+    imageUrl: 'https://your-pod-cdn.vovastelmashchuk.site/logo.jpg',
   }));
 
   return h.view('podcastList', {

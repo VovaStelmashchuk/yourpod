@@ -1,51 +1,109 @@
-import * as Minio from 'minio'
+import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 
 import dotenv from 'dotenv';
+import Fs from 'fs'
 
 dotenv.config();
 
-const baseurl = process.env.BASE_URL;
+const startUrl = process.env.S3_START_URL;
+const s3Endpoint = process.env.S3_ENDPOINT;
+const bucketName = process.env.S3_BUCKET_NAME;
 
-const minioEndpoint = process.env.MINIO_END_POINT
-const minioPort = process.env.MINIO_PORT
-const minioAccessKey = process.env.MINIO_ACCESS_KEY
-const minioSecretKey = process.env.MINIO_SECRET_KEY
-const bucketName = 'story-podcast'
+const client = new S3Client({
+  endpoint: s3Endpoint,
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY,
+    secretAccessKey: process.env.S3_SECRET_KEY,
+  },
+  region: process.env.S3_REGION,
+  s3ForcePathStyle: true,
+});
 
-const minioClient = new Minio.Client({
-  endPoint: minioEndpoint,
-  port: Number(minioPort),
-  useSSL: false,
-  accessKey: minioAccessKey,
-  secretKey: minioSecretKey,
-})
-
-export function buildObjectURL(minioKey) {
-  return `${baseurl}/files/${minioKey}`;
+export function buildObjectURL(path) {
+  return `${startUrl}/${path}`;
 }
 
 export async function getFileSizeInByte(key) {
-  const stat = await minioClient.statObject(bucketName, key)
-  return stat.size
+  try {
+    const command = new HeadObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+    });
+
+    const response = await client.send(command);
+
+    return response.ContentLength;
+  } catch (error) {
+    console.error("Error retrieving file size: ", error);
+    throw error;
+  }
 }
 
 export async function uploadFile(key, body) {
-  await minioClient.putObject(bucketName, key, body, undefined, {
-    'Content-Type': 'text/xml',
-  })
+  try {
+    const params = {
+      Bucket: bucketName,
+      Key: key,
+      Body: body,
+    };
+
+    await client.send(new PutObjectCommand(params));
+
+    console.log(`File uploaded successfully, key = ${key}`);
+  } catch (error) {
+    console.error('Error uploading file:', error);
+  }
 }
 
-export async function uploadFileFromPath(key, path) {
-  await minioClient.fPutObject(bucketName, key, path, undefined, {
-    'Content-Type': 'text/xml',
-  })
+export async function uploadFileFromPath(key, filePath) {
+  try {
+    const fileContent = Fs.readFileSync(filePath);
+
+    const params = {
+      Bucket: bucketName,
+      Key: key,
+      Body: fileContent,
+    };
+
+    await client.send(new PutObjectCommand(params));
+
+    console.log(`File uploaded successfully, key = ${key}`);
+  } catch (error) {
+    console.error('Error uploading file:', error);
+  }
 }
 
 export async function downloadFile(key, localPath) {
-  await minioClient.fGetObject(bucketName, key, localPath, function(err) {
-    if (err) {
-      return console.log(err)
-    }
-    console.log(`success download file ${key} to ${localPath}`)
-  })
+  console.log(`Downloading file ${key} to ${localPath}`);
+
+  try {
+    const command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+    });
+
+    const data = await client.send(command);
+
+    Fs.mkdirSync(localPath.split('/').slice(0, -1).join('/'), { recursive: true });
+    const writableStream = Fs.createWriteStream(localPath);
+
+    // Pipe the data from the response to the file
+    data.Body.pipe(writableStream);
+
+    // Return a promise to ensure it completes before the function resolves
+    return new Promise((resolve, reject) => {
+      writableStream.on('finish', () => {
+        console.log(`Successfully downloaded file ${key} to ${localPath}`);
+        resolve();
+      });
+      writableStream.on('error', (err) => {
+        console.error('Error writing file to disk:', err);
+        reject(err);
+      });
+    });
+  } catch (err) {
+    console.error('Error downloading file:', err);
+    throw err; // Optionally rethrow the error for further handling
+  }
 }
+

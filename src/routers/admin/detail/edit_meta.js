@@ -3,7 +3,7 @@ import { getPostBySlug, updateTimeCodeBySlug, updateLinkBySlug } from "../../../
 async function updateTimeCode(request, h) {
   const showSlug = request.params.showSlug;
   const episodeSlug = request.params.episodeSlug;
-  
+
   const { hours, minutes, seconds, text, isPublic } = request.payload;
   const isPublicValue = isPublic === 'on' ? true : false;
 
@@ -19,10 +19,12 @@ async function updateTimeCode(request, h) {
 async function updateLink(request, h) {
   const { link, text } = request.payload;
 
-  const slug = request.params.slug;
+  const showSlug = request.params.showSlug;
+  const episodeSlug = request.params.episodeSlug;
+
   const index = request.params.index;
 
-  await updateLinkBySlug(slug, index, link, text);
+  await updateLinkBySlug(showSlug, episodeSlug, index, link, text);
   return h.response().code(200).header('HX-Trigger', 'update-preview');
 }
 
@@ -48,15 +50,18 @@ async function addTimeCode(request, h) {
 }
 
 async function addLink(request, h) {
-  const slug = request.params.slug;
-  const podcast = await getPostBySlug(slug);
+  const showSlug = request.params.showSlug;
+  const episodeSlug = request.params.episodeSlug;
+
+  const podcast = await getPostBySlug(showSlug, episodeSlug);
 
   const index = podcast.links.length;
 
   return h.view(
     'editable_link',
     {
-      slug: slug,
+      showSlug: showSlug,
+      episodeSlug: episodeSlug,
       index: index,
     },
     {
@@ -86,7 +91,7 @@ export function editPodcastMetaInfo(server) {
 
   server.route({
     method: 'PUT',
-    path: '/admin/podcast/{slug}/links/{index}',
+    path: '/admin/show/{showSlug}/episode/{episodeSlug}/links/{index}',
     handler: updateLink,
     options: {
       auth: 'adminSession',
@@ -95,7 +100,7 @@ export function editPodcastMetaInfo(server) {
 
   server.route({
     method: 'POST',
-    path: '/admin/podcast/{slug}/add-link',
+    path: '/admin/show/{showSlug}/episode/{episodeSlug}/add-link',
     handler: addLink,
     options: {
       auth: 'adminSession',

@@ -14,9 +14,10 @@ export function getPublicPosts(showSlug) {
   ).toArray();
 }
 
-export function getPodcastForRss() {
+export function getPodcastForRss(showSlug) {
   return Database.collection('posts').find(
     {
+      'showSlug': showSlug,
       'visibility': 'public',
       'type': 'public'
     },
@@ -42,12 +43,15 @@ export function getAllPosts(showSlug) {
 }
 
 export function updatePodcastNameBySlug(showSlug, episodeSlug, podcastName) {
-  return Database.collection('posts').updateOne({
-    showSlug: showSlug,
-    slug: episodeSlug
-  }, {
-    $set: { title: podcastName }
-  });
+  return Database.collection('posts').updateOne(
+    {
+      showSlug: showSlug,
+      slug: episodeSlug
+    },
+    {
+      $set: { title: podcastName }
+    }
+  );
 }
 
 export function updateTimeCodeBySlug(showSlug, episodeSlug, index, time, description, isPublicValue) {
@@ -68,9 +72,12 @@ export function updateTimeCodeBySlug(showSlug, episodeSlug, index, time, descrip
   );
 }
 
-export function updateLinkBySlug(slug, index, link, title) {
+export function updateLinkBySlug(showSlug, episodeSlug, index, link, title) {
   return Database.collection('posts').updateOne(
-    { slug: slug },
+    {
+      showSlug: showSlug,
+      slug: episodeSlug
+    },
     {
       $set: {
         [`links.${index}.link`]: link,
@@ -84,19 +91,19 @@ export function getPostBySlug(showSlug, episodeSlug) {
   return Database.collection('posts').findOne({ slug: episodeSlug, showSlug: showSlug });
 }
 
-export function updateMontageStatusBySlug(slug, status) {
-  return Database.collection('posts').updateOne({ slug: slug }, { $set: { montage_status: status } });
+export function updateMontageStatusBySlug(showSlug, episodeSlug, status) {
+  return Database.collection('posts').updateOne({ slug: episodeSlug, showSlug: showSlug }, { $set: { montage_status: status } });
 }
 
-export function updateMontageStatusToSuccessBySlug(slug, publicAudioFile) {
-  return Database.collection('posts').updateOne({ slug: slug }, { $set: { montage_status: 'success', publicAudioFile: publicAudioFile } });
+export function updatePublicAudio(showSlug, episodeSlug, publicAudioFile) {
+  return Database.collection('posts').updateOne({ showSlug: showSlug, slug: episodeSlug }, { $set: { publicAudioFile: publicAudioFile } });
 }
 
-export function publishPodcast(slug) {
-  return Database.collection('posts').updateOne({ slug: slug }, { $set: { visibility: 'public' } });
+export function publishPodcast(showSlug, episodeSlug) {
+  return Database.collection('posts').updateOne({ showSlug: showSlug, slug: episodeSlug }, { $set: { visibility: 'public' } });
 }
 
-export function unpublishPodcast(slug) {
-  return Database.collection('posts').updateOne({ slug: slug }, { $set: { visibility: 'private' } });
+export function unpublishPodcast(showSlug, episodeSlug) {
+  return Database.collection('posts').updateOne({ showSlug: showSlug, slug: episodeSlug }, { $set: { visibility: 'private' } });
 }
 
