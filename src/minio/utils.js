@@ -20,7 +20,7 @@ const client = new S3Client({
 });
 
 export function buildObjectURL(path) {
-  return `${startUrl}/${path}`;
+  return `${startUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
 }
 
 export async function getFileSizeInByte(key) {
