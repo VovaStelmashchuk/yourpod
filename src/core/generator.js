@@ -9,13 +9,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const host = process.env.BASE_URL;
+const rssFileName = process.env.PODCAST_RSS_FILE_NAME;
 
 export async function updateRss(showSlug) {
   const podcasts = await getPodcastForRss(showSlug);
-  const logoUrl = buildObjectURL(showSlug + '/logo.jpg')
-
   const showInfo = await getShowBySlug(showSlug);
 
+  const logoUrl = buildObjectURL(showInfo.showLogoUrl);
   const description = showInfo.about;
 
   const author = showInfo.authors;
@@ -25,10 +25,10 @@ export async function updateRss(showSlug) {
   const feed = new Podcast({
     title: showInfo.showName,
     description: description,
-    feedUrl: buildObjectURL(showSlug + '/rss.xml'),
+    feedUrl: buildObjectURL(`${showSlug}/${rssFileName}`),
     siteUrl: host,
     webMaster: host,
-    generator: 'Android story',
+    generator: 'YourPod',
     imageUrl: logoUrl,
     author: author,
     copyright: '© 20220-2024' + showInfo.showName,
@@ -97,7 +97,7 @@ export async function updateRss(showSlug) {
 
   const xml = feed.buildXml();
 
-  await uploadFile(showSlug + '/rss.xml', xml);
+  await uploadFile(`${showSlug}/${rssFileName}`, xml);
 }
 
 export function buildPublicChapters(chapters) {

@@ -1,10 +1,18 @@
 import { getPostBySlug } from "../../core/episodeRepo.js";
 import { buildObjectURL } from "../../minio/utils.js";
 import { buildPublicChapters } from "../../core/generator.js";
+import { getShowBySlug } from "../../core/podcastRepo.js";
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const startUrl = process.env.S3_START_URL;
 
 async function podcastDetailsHandler(request, h) {
   const showSlug = request.params.showSlug;
   const episodeSlug = request.params.episodeSlug;
+
+  const showInfo = await getShowBySlug(showSlug);
 
   const podcast = await getPostBySlug(showSlug, episodeSlug);
   const publicChapters = buildPublicChapters(podcast.charters)
@@ -13,6 +21,7 @@ async function podcastDetailsHandler(request, h) {
     {
       title: podcast.title,
       audioUrl: buildObjectURL(podcast.publicAudioFile),
+      imageUrl: `${startUrl}${showInfo.showLogoUrl}`,
       chapters: publicChapters
         .map(chapter => {
           return {

@@ -1,11 +1,17 @@
 import { getAllPosts } from "../../core/episodeRepo.js";
 import { getAllShows, getShowBySlug } from "../../core/showRepo.js";
 
+import dotenv from 'dotenv';
+dotenv.config();
+
+const startS3Url = process.env.S3_START_URL;
+
 async function dashboardView(request, h) {
   const shows = await getAllShows();
   const showsUiModel = shows.map(show => ({
     url: `/admin/show/${show.slug}`,
     showName: show.showName,
+    showLogoUrl: `${startS3Url}${show.showLogoUrl}`,
   }));
 
   return h.view(

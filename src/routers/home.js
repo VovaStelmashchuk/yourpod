@@ -1,5 +1,10 @@
 import { getPublicPosts } from "../core/episodeRepo.js";
 import { getShowInfo } from "../core/podcastRepo.js";
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const startUrl = process.env.S3_START_URL;
 
 async function homeHandler(request, h) {
   const host = request.headers.host;
@@ -16,12 +21,12 @@ async function homeHandler(request, h) {
 async function podcastListHandler(request, h) {
   const host = request.headers.host;
   const showInfo = await getShowInfo(host);
-  const posts = await getPublicPosts(showInfo.slug);
-  const postsWithChartersDescription = posts.map(post => ({
+  const podcasts = await getPublicPosts(showInfo.slug);
+  const postsWithChartersDescription = podcasts.map(post => ({
     ...post,
     chartersDescription: post.charters ? post.charters.map(charter => charter.description).join(' ') : '',
     url: post.type === 'public' ? `/podcast/${post.slug}` : 'https://www.patreon.com/androidstory',
-    imageUrl: 'https://your-pod-cdn.vovastelmashchuk.site/logo.jpg',
+    imageUrl: `${startUrl}${showInfo.showLogoUrl}`,
   }));
 
   return h.view('podcastList', {

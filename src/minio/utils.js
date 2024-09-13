@@ -55,7 +55,7 @@ export async function uploadFile(key, body) {
   }
 }
 
-export async function uploadFileFromPath(key, filePath) {
+export async function uploadFileFromPath(key, filePath, contentType) {
   try {
     const fileContent = Fs.readFileSync(filePath);
 
@@ -63,6 +63,7 @@ export async function uploadFileFromPath(key, filePath) {
       Bucket: bucketName,
       Key: key,
       Body: fileContent,
+      ContentType: contentType,
     };
 
     await client.send(new PutObjectCommand(params));
@@ -70,6 +71,7 @@ export async function uploadFileFromPath(key, filePath) {
     console.log(`File uploaded successfully, key = ${key}`);
   } catch (error) {
     console.error('Error uploading file:', error);
+    throw error;
   }
 }
 
@@ -104,6 +106,22 @@ export async function downloadFile(key, localPath) {
   } catch (err) {
     console.error('Error downloading file:', err);
     throw err; // Optionally rethrow the error for further handling
+  }
+}
+
+export async function getFileContent(key) {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+    });
+
+    const data = await client.send(command);
+
+    return data.Body;
+  } catch (error) {
+    console.error('Error getting file content:', error);
+    throw error;
   }
 }
 

@@ -2,6 +2,11 @@ import { getPostBySlug } from "../core/episodeRepo.js";
 import { buildObjectURL } from "../minio/utils.js";
 import { buildPublicChapters } from "../core/generator.js";
 import { getShowInfo } from "../core/podcastRepo.js";
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const startUrl = process.env.S3_START_URL;
 
 async function podcastDetailsHandler(request, h) {
   const host = request.headers.host;
@@ -19,7 +24,7 @@ async function podcastDetailsHandler(request, h) {
       header_links: showInfo.links,
       title: podcast.title,
       audioUrl: buildObjectURL(podcast.publicAudioFile),
-      imageUrl: `https://your-pod-cdn.vovastelmashchuk.site/${showInfo.slug}/logo.jpg`,
+      imageUrl: `${startUrl}${showInfo.showLogoUrl}`,
       chapters: publicChapters
         .map(chapter => {
           return {

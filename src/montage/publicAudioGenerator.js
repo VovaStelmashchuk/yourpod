@@ -40,15 +40,15 @@ async function createPublicAudioJob(podcast) {
 export async function createPublicAudio(podcast) {
   const publicAudioPath = `${podcast.showSlug}/episodes/${podcast.slug}.mp3`;
   await updatePublicAudio(podcast.showSlug, podcast.slug, publicAudioPath);
-  await modifyPodcastStatus(podcast.slug, 'in_progress');
+  await modifyPodcastStatus(podcast.showSlug, podcast.slug, 'in_progress');
 
   createPublicAudioJob(podcast)
     .then(async () => {
-      await modifyPodcastStatus(podcast.slug, 'in_progress');
+      await modifyPodcastStatus(podcast.showSlug, podcast.slug, 'success');
       console.log('Public audio creation successful.');
     })
     .catch(async (error) => {
-      await modifyPodcastStatus(podcast.slug, 'failure');
+      await modifyPodcastStatus(podcast.showSlug, podcast.slug, 'failure');
       console.error('Public audio creation failed:', error);
     });
 

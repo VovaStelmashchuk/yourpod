@@ -9,6 +9,7 @@ import { staticFiles } from './routers/staticFiles.js';
 import { admin } from './routers/admin/login.js';
 import { adminAuth } from './routers/admin/auth.js';
 import { editPodcastDetails } from './routers/admin/details.js'
+import { rss } from './routers/rss/rss.js';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -49,6 +50,7 @@ const init = async () => {
   podcastDetails(server);
   admin(server);
   editPodcastDetails(server);
+  rss(server);
 
   await server.start();
   console.log('Server running on %s', server.info.uri);

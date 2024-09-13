@@ -49,7 +49,7 @@ export async function applyFFmpegToFileInMinio(inputKey, outputKey, ffmpegComman
       console.log(`child process exited with code ${code}`);
       if (code === 0) {
         // Upload file only if the process exits successfully
-        await uploadFileFromPath(outputKey, output);
+        await uploadFileFromPath(outputKey, output, 'audio/mpeg');
         console.log('Uploaded file to minio');
         resolve();
       } else {
