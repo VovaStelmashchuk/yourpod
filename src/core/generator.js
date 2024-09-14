@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const startUrl = process.env.S3_START_URL;
 const host = process.env.BASE_URL;
 const rssFileName = process.env.PODCAST_RSS_FILE_NAME;
 
@@ -15,7 +16,7 @@ export async function updateRss(showSlug) {
   const podcasts = await getPodcastForRss(showSlug);
   const showInfo = await getShowBySlug(showSlug);
 
-  const logoUrl = buildObjectURL(showInfo.showLogoUrl);
+  const logoUrl = `${startUrl}${showInfo.showLogoUrl}`;
   const description = showInfo.about;
 
   const author = showInfo.authors;
@@ -25,7 +26,7 @@ export async function updateRss(showSlug) {
   const feed = new Podcast({
     title: showInfo.showName,
     description: description,
-    feedUrl: buildObjectURL(`${showSlug}/${rssFileName}`),
+    feedUrl: `${startUrl}/${showSlug}/${rssFileName}`,
     siteUrl: host,
     webMaster: host,
     generator: 'YourPod',
