@@ -44,6 +44,9 @@ async function adminPodcastList(request, h) {
     {
       pageTitle: pageTitle,
       posts: uiPosts,
+      createPodcastButton: {
+        title: 'Create Podcast',
+      }
     },
     {
       layout: 'admin'

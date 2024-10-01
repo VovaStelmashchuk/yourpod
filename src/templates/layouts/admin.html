@@ -8,11 +8,18 @@
   <script src="https://unpkg.com/htmx.org@2.0.1"></script>
 </head>
 
-<body class="bg-gray-100 text-gray-900 font-sans">
+<body class="bg-gray-100 text-gray-900 font-sans min-h-screen flex flex-col">
   {{> admin_head}}
-  <div class="container max-w-screen-xl mx-auto">
+
+  <div class="container max-w-screen-xl mx-auto flex-grow">
     {{{ content }}}
   </div>
+
+  <div id="dialog-container"></div>
+
+  <footer class="bg-black p-4 text-center mt-auto">
+    <p class="text-white">&copy; 2024 DIY podcast hosting</p>
+  </footer>
 </body>
 
 </html>

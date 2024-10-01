@@ -710,6 +710,10 @@ input {
   margin-top: 1rem;
 }
 
+.mt-auto {
+  margin-top: auto;
+}
+
 .line-clamp-3 {
   overflow: hidden;
   display: -webkit-box;
@@ -764,6 +768,10 @@ input {
   height: 100%;
 }
 
+.min-h-screen {
+  min-height: 100vh;
+}
+
 .w-1\/2 {
   width: 50%;
 }
@@ -794,6 +802,10 @@ input {
 
 .flex-1 {
   flex: 1 1 0%;
+}
+
+.flex-grow {
+  flex-grow: 1;
 }
 
 .cursor-pointer {
@@ -1088,6 +1100,10 @@ input {
 
 html {
   overflow-y: scroll;
+}
+
+html, body {
+  height: 100%;
 }
 
 .selected {
