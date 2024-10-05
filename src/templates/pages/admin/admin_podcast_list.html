@@ -1,9 +1,11 @@
-{{> btn_create_podcast createPodcastButton}}
+<div class="p-2" id="adminPodcastList">
+  {{> btn_create_podcast createPodcastButton}}
 
-<div class="grid grid-cols-1 gap-4">
-  {{#each posts}}
-  <a href="{{detailUrl}}" class="no-underline bg-white p-8 rounded shadow-md">
-    <h2 class="text-xl font-bold line-clamp-3">{{title}}</h2>
-  </a>
-  {{/each}}
+  <div class="grid grid-cols-1 gap-4">
+    {{#each posts}}
+    <a href="{{detailUrl}}" class="no-underline bg-white p-8 rounded shadow-md">
+      <h2 class="text-xl font-bold line-clamp-3">{{title}}</h2>
+    </a>
+    {{/each}}
+  </div>
 </div>

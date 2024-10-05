@@ -38,7 +38,7 @@ async function getPodcastDetails(request, h) {
           episodeSlug: podcast.slug,
           index: index,
           link: link.link,
-          text: link.title,
+          text: link.text,
         }
       }),
       isAudioBuildInProgress: podcast.montage_status === 'in_progress',

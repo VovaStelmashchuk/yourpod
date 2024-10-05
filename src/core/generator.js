@@ -145,7 +145,7 @@ function buildRssDescription(post) {
     description += '<h3>Згадано в випуску</h3>';
     description += '<ul>'
     post.links.forEach(link => {
-      description += `<a href="${link.link}">${link.title}</a>`;
+      description += `<a href="${link.link}">${link.text}</a>`;
       description += '<br>';
     });
     description += '</ul>'

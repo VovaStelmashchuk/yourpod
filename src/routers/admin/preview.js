@@ -34,7 +34,7 @@ async function podcastDetailsHandler(request, h) {
         .map(link => {
           return {
             link: link.link,
-            title: link.title,
+            text: link.text,
           }
         }),
     },

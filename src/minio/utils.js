@@ -2,6 +2,7 @@ import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand } from 
 
 import dotenv from 'dotenv';
 import Fs from 'fs'
+import url from 'url';
 
 dotenv.config();
 
@@ -20,7 +21,10 @@ const client = new S3Client({
 });
 
 export function buildObjectURL(path) {
-  return `${startUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+  if (!path) {
+    return undefined;
+  }
+  return url.resolve(startUrl, path);
 }
 
 export async function getFileSizeInByte(key) {

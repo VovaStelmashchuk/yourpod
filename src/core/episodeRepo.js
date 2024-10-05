@@ -72,7 +72,7 @@ export function updateTimeCodeBySlug(showSlug, episodeSlug, index, time, descrip
   );
 }
 
-export function updateLinkBySlug(showSlug, episodeSlug, index, link, title) {
+export function updateLinkBySlug(showSlug, episodeSlug, index, link, text) {
   return Database.collection('posts').updateOne(
     {
       showSlug: showSlug,
@@ -81,7 +81,7 @@ export function updateLinkBySlug(showSlug, episodeSlug, index, link, title) {
     {
       $set: {
         [`links.${index}.link`]: link,
-        [`links.${index}.title`]: title
+        [`links.${index}.text`]: text,
       }
     }
   );
@@ -106,4 +106,18 @@ export function publishPodcast(showSlug, episodeSlug) {
 export function unpublishPodcast(showSlug, episodeSlug) {
   return Database.collection('posts').updateOne({ showSlug: showSlug, slug: episodeSlug }, { $set: { visibility: 'private' } });
 }
+
+export function createPodcast(showSlug, name, slug, links) {
+  return Database.collection('posts').insertOne({
+    showSlug: showSlug,
+    title: name,
+    slug: slug,
+    links: links,
+    charters: [],
+    visibility: 'private',
+    publish_date: new Date(),
+    type: 'public',
+  });
+}
+
 

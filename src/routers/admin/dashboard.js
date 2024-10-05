@@ -1,5 +1,6 @@
-import { getAllPosts } from "../../core/episodeRepo.js";
+import { getAllPosts, createPodcast } from "../../core/episodeRepo.js";
 import { getAllShows, getShowBySlug } from "../../core/showRepo.js";
+import slugify from 'slugify';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -26,9 +27,7 @@ async function dashboardView(request, h) {
   )
 }
 
-async function adminPodcastList(request, h) {
-  const showSlug = request.params.showSlug;
-
+async function adminPodcastListBySlug(showSlug, h, layout) {
   const show = await getShowBySlug(showSlug);
   const posts = await getAllPosts(showSlug);
 
@@ -46,12 +45,30 @@ async function adminPodcastList(request, h) {
       posts: uiPosts,
       createPodcastButton: {
         title: 'Create Podcast',
+        showSlug: showSlug,
       }
     },
     {
-      layout: 'admin'
+      layout: layout
     }
   )
+}
+
+async function createPodcastHandler(request, h) {
+  const { episodeName } = request.payload;
+  const showSlug = request.params.showSlug;
+  const show = await getShowBySlug(showSlug);
+
+  const slug = slugify(episodeName);
+
+  await createPodcast(show.slug, episodeName, slug, show.links);
+
+  return adminPodcastListBySlug(showSlug, h, false);
+}
+
+async function adminPodcastList(request, h) {
+  const showSlug = request.params.showSlug;
+  return adminPodcastListBySlug(showSlug, h, "admin");
 }
 
 export function adminDashboard(server) {
@@ -68,6 +85,14 @@ export function adminDashboard(server) {
     method: 'GET',
     path: '/admin/show/{showSlug}',
     handler: adminPodcastList,
+    options: {
+      auth: 'adminSession',
+    }
+  })
+  server.route({
+    method: 'POST',
+    path: '/admin/show/{showSlug}/episode',
+    handler: createPodcastHandler,
     options: {
       auth: 'adminSession',
     }

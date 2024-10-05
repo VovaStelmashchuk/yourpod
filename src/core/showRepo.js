@@ -5,7 +5,7 @@ export async function getAllShows() {
 }
 
 export async function getShowBySlug(slug) {
-  return Database.collection('shows').findOne({ slug });
+  return Database.collection('shows').findOne({ slug: slug });
 }
  
 export async function getShowInfo(podcastDomain) {
