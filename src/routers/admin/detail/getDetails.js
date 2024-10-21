@@ -8,6 +8,39 @@ async function getPodcastDetails(request, h) {
 
   const podcast = await getPostBySlug(showSlug, episodeSlug);
 
+  let media = {
+    showAudio: false,
+    showVideo: false,
+    showUploadVideoButton: true,
+    audioUrl: buildObjectURL(podcast.originFilePath),
+    uploadUrl: `/admin/show/${showSlug}/episode/${episodeSlug}/upload`,
+  }
+  if (podcast.videoPath && podcast.originFilePath) {
+    media = {
+      showAudio: true,
+      showVideo: true,
+      showUploadVideoButton: false,
+      videoUrl: buildObjectURL(podcast.videoPath),
+      audioUrl: buildObjectURL(podcast.originFilePath),
+    }
+  }
+  if (podcast.videoPath) {
+    media = {
+      showAudio: false,
+      showVideo: true,
+      showUploadVideoButton: false,
+      videoUrl: buildObjectURL(podcast.videoPath),
+    }
+  }
+  if (podcast.originFilePath) {
+    media = {
+      showAudio: true,
+      showVideo: false,
+      showUploadVideoButton: false,
+      audioUrl: buildObjectURL(podcast.originFilePath),
+    }
+  }
+
   return h.view(
     'admin/admin_podcast_detail',
     {
@@ -15,13 +48,7 @@ async function getPodcastDetails(request, h) {
       slug: podcast.slug,
       showSlug: showSlug,
       episodeSlug: podcast.slug,
-      media: {
-        showAudio: false,
-        showVideo: false,
-        showUploadVideoButton: true,
-        audioUrl: buildObjectURL(podcast.originFilePath),
-        uploadUrl: `/admin/show/${showSlug}/episode/${episodeSlug}/upload`,
-      },
+      media: media,
       timecodes: podcast.charters.map((chapter, index) => {
         const splitTime = chapter.time.split(':');
         const hour = splitTime[0];

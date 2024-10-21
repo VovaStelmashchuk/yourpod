@@ -54,6 +54,18 @@ export function updatePodcastNameBySlug(showSlug, episodeSlug, podcastName) {
   );
 }
 
+export function updateVideoPathBySlug(showSlug, episodeSlug, videoPath) {
+  return Database.collection('posts').updateOne(
+    {
+      showSlug: showSlug,
+      slug: episodeSlug
+    },
+    {
+      $set: { videoPath: videoPath }
+    }
+  );
+}
+
 export function updateTimeCodeBySlug(showSlug, episodeSlug, index, time, description, isPublicValue) {
   const timeInSeconds = time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
   return Database.collection('posts').updateOne(
