@@ -10,6 +10,7 @@ import { admin } from './routers/admin/login.js';
 import { adminAuth } from './routers/admin/auth.js';
 import { editPodcastDetails } from './routers/admin/details.js'
 import { rss } from './routers/rss/rss.js';
+import { uploadVideoController } from './routers/admin/detail/file.js';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -22,7 +23,7 @@ const init = async () => {
   const server = _server({
     port: 3000,
     host: '0.0.0.0',
-    debug: { request: ['error'] }
+    debug: { request: ['error'] },
   });
 
   await server.register(Inert);
@@ -51,6 +52,7 @@ const init = async () => {
   admin(server);
   editPodcastDetails(server);
   rss(server);
+  uploadVideoController(server);
 
   await server.start();
   console.log('Server running on %s', server.info.uri);

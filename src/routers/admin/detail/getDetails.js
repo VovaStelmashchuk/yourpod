@@ -15,7 +15,13 @@ async function getPodcastDetails(request, h) {
       slug: podcast.slug,
       showSlug: showSlug,
       episodeSlug: podcast.slug,
-      audioUrl: buildObjectURL(podcast.originFilePath),
+      media: {
+        showAudio: false,
+        showVideo: false,
+        showUploadVideoButton: true,
+        audioUrl: buildObjectURL(podcast.originFilePath),
+        uploadUrl: `/admin/show/${showSlug}/episode/${episodeSlug}/upload`,
+      },
       timecodes: podcast.charters.map((chapter, index) => {
         const splitTime = chapter.time.split(':');
         const hour = splitTime[0];
