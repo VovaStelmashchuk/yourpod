@@ -30,7 +30,7 @@ async function uploadVideo(request, h) {
       const file = data.video;
       console.log(file);
 
-      const uploadDir = `uploads/`;
+      const uploadDir = `.tmp/uploads/`;
       fs.mkdirSync(uploadDir, { recursive: true });
 
       if (!fs.existsSync(uploadDir)) {
@@ -56,6 +56,8 @@ async function uploadVideo(request, h) {
       return h.view(
         'media_component',
         {
+          showSlug: showSlug,
+          episodeSlug: episodeSlug,
           showAudio: false,
           showVideo: true,
           videoUrl: `${startUrl}/${s3FileKey}`,

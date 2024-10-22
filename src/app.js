@@ -14,6 +14,7 @@ import { uploadVideoController } from './routers/admin/detail/file.js';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { media } from './routers/admin/detail/mediaMontage.js';
 
 function registerViewFunctions() {
   Handlebars.registerHelper('eq', (a, b) => a === b);
@@ -53,6 +54,7 @@ const init = async () => {
   editPodcastDetails(server);
   rss(server);
   uploadVideoController(server);
+  media(server);
 
   await server.start();
   console.log('Server running on %s', server.info.uri);

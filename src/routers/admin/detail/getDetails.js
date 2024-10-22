@@ -41,6 +41,9 @@ async function getPodcastDetails(request, h) {
     }
   }
 
+  media.showSlug = showSlug;
+  media.episodeSlug = episodeSlug;
+
   return h.view(
     'admin/admin_podcast_detail',
     {

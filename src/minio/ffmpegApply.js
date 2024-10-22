@@ -26,11 +26,13 @@ export async function applyFFmpegToFileInMinio(inputKey, outputKey, ffmpegComman
 
   // Wrap the child process in a promise
   await new Promise((resolve, reject) => {
-    const child = spawn(ffmpegPath, [
-      '-i', `${folder}/${inputKey}`,
-      '-filter_complex', ffmpegCommand,
-      output,
-    ]);
+    const commandArray = ['-i', `${folder}/${inputKey}`];
+    if (ffmpegCommand) {
+      commandArray.push('-filter_complex', ffmpegCommand);
+    }
+    commandArray.push(output);
+    console.log('commandArray', commandArray);
+    const child = spawn(ffmpegPath, commandArray);
 
     child.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);

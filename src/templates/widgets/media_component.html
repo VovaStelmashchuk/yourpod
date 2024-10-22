@@ -1,24 +1,29 @@
+{{#if showAudio}}
 <div class="w-full sm:p-0 sm:m-0 mx-auto-2 lg:px-0">
-  {{#if showAudio}}
   <div id="audio-player-container">
     <audio id="audio-player" controls class="w-full">
       <source src="{{audioUrl}}" type="audio/mpeg">
       Your browser does not support the audio element.
     </audio>
   </div>
-  {{/if}}
 </div>
+{{else}}
+<button hx-post="/admin/show/{{showSlug}}/episode/{{episodeSlug}}/buildAudio" hx-swap="outerHTML"
+  class="common-button w-full px-4 py-2 my-2 transition-all duration-300 ease-in-out">
+  Build Audio
+</button>
+{{/if}}
 
+{{#if showVideo}}
 <div class="w-full">
-  {{#if showVideo}}
   <div id="video-player-container">
     <video id="video-player" controls class="w-full">
       <source src="{{videoUrl}}" type="video/mp4">
       Your browser does not support the video element.
     </video>
   </div>
-  {{/if}}
 </div>
+{{/if}}
 
 {{#if showUploadVideoButton}}
 <div class="w-full">
