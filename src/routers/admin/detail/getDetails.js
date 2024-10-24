@@ -12,17 +12,8 @@ async function getPodcastDetails(request, h) {
     showAudio: false,
     showVideo: false,
     showUploadVideoButton: true,
-    audioUrl: buildObjectURL(podcast.originFilePath),
+    audioUrl: buildObjectURL(podcast.audioPath),
     uploadUrl: `/admin/show/${showSlug}/episode/${episodeSlug}/upload`,
-  }
-  if (podcast.videoPath && podcast.originFilePath) {
-    media = {
-      showAudio: true,
-      showVideo: true,
-      showUploadVideoButton: false,
-      videoUrl: buildObjectURL(podcast.videoPath),
-      audioUrl: buildObjectURL(podcast.originFilePath),
-    }
   }
   if (podcast.videoPath) {
     media = {
@@ -38,6 +29,15 @@ async function getPodcastDetails(request, h) {
       showVideo: false,
       showUploadVideoButton: false,
       audioUrl: buildObjectURL(podcast.originFilePath),
+    }
+  }
+  if (podcast.videoPath && podcast.audioPath) {
+    media = {
+      showAudio: true,
+      showVideo: true,
+      showUploadVideoButton: false,
+      videoUrl: buildObjectURL(podcast.videoPath),
+      audioUrl: buildObjectURL(podcast.audioPath),
     }
   }
 

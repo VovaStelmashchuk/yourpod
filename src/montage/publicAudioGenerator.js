@@ -34,7 +34,7 @@ async function createPublicAudioJob(podcast) {
 
   complexFilterString += `concat=n=${publicIndex - 1}:v=0:a=1`;
 
-  await applyFFmpegToFileInMinio(podcast.originFilePath, podcast.publicAudioFile, complexFilterString)
+  await applyFFmpegToFileInMinio(podcast.audioPath, podcast.publicAudioFile, complexFilterString)
 }
 
 export async function createPublicAudio(podcast) {

@@ -65,6 +65,29 @@ export function updateVideoPathBySlug(showSlug, episodeSlug, videoPath) {
     }
   );
 }
+export function updatePublicAudio(showSlug, episodeSlug, publicAudioFile) {
+  return Database.collection('posts').updateOne(
+    {
+      showSlug: showSlug,
+      slug: episodeSlug
+    },
+    {
+      $set: { publicAudioFile: publicAudioFile }
+    }
+  );
+}
+
+export function updateAudioPathBySlug(showSlug, episodeSlug, audioPath) {
+  return Database.collection('posts').updateOne(
+    {
+      showSlug: showSlug,
+      slug: episodeSlug
+    },
+    {
+      $set: { audioPath: audioPath }
+    }
+  );
+}
 
 export function updateTimeCodeBySlug(showSlug, episodeSlug, index, time, description, isPublicValue) {
   const timeInSeconds = time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
@@ -107,9 +130,6 @@ export function updateMontageStatusBySlug(showSlug, episodeSlug, status) {
   return Database.collection('posts').updateOne({ slug: episodeSlug, showSlug: showSlug }, { $set: { montage_status: status } });
 }
 
-export function updatePublicAudio(showSlug, episodeSlug, publicAudioFile) {
-  return Database.collection('posts').updateOne({ showSlug: showSlug, slug: episodeSlug }, { $set: { publicAudioFile: publicAudioFile } });
-}
 
 export function publishPodcast(showSlug, episodeSlug) {
   return Database.collection('posts').updateOne({ showSlug: showSlug, slug: episodeSlug }, { $set: { visibility: 'public' } });
