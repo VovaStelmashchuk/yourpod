@@ -2,21 +2,11 @@ import fs from 'fs'
 import path from 'path'
 import { uploadFileFromPath } from "../../../minio/utils.js";
 import { updateVideoPathBySlug } from '../../../core/episodeRepo.js';
+import { generateRandomString } from '../../../core/utils.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
 const startUrl = process.env.S3_START_URL;
-
-function fileSuffix() {
-  const count = 64;
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  for (let i = 0; i < count; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength))
-  }
-  return result
-}
 
 async function uploadVideo(request, h) {
   try {
@@ -26,7 +16,7 @@ async function uploadVideo(request, h) {
       const fileFormat = "mp4";
       const showSlug = request.params.showSlug;
       const episodeSlug = request.params.episodeSlug;
-      const saveFileName = `${episodeSlug}-${fileSuffix()}.${fileFormat}`;
+      const saveFileName = `${showSlug}-${episodeSlug}.${fileFormat}`;
       const file = data.video;
       console.log(file);
 
@@ -47,7 +37,7 @@ async function uploadVideo(request, h) {
         file.on('end', () => resolve());
       });
 
-      const s3FileKey = `${showSlug}/videos/${saveFileName}`
+      const s3FileKey = `${showSlug}/episodes/${episodeSlug}/video-${generateRandomString(32)}.${fileFormat}`;
       await uploadFileFromPath(s3FileKey, filePath, "video/mov");
       await updateVideoPathBySlug(showSlug, episodeSlug, s3FileKey);
 
