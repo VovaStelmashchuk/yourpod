@@ -1,23 +1,23 @@
-import * as Cookie from '@hapi/cookie'
-import { getUserBySessionId } from '../../core/user.js';
+import * as Cookie from "@hapi/cookie";
+import { getUserBySessionId } from "../../core/user.js";
 
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
-const isSecure = process.env.IS_SECURE === 'true';
-const cookiePass = process.env.COOKIE_PASS
+const isSecure = process.env.IS_SECURE === "true";
+const cookiePass = process.env.COOKIE_PASS;
 
 export async function adminAuth(server) {
   await server.register(Cookie);
 
-  server.auth.strategy('adminSession', 'cookie', {
+  server.auth.strategy("adminSession", "cookie", {
     cookie: {
-      name: 'sessionId',
+      name: "sessionId",
       password: cookiePass,
       isSecure: isSecure,
     },
-    redirectTo: '/login',
+    redirectTo: "/login",
     validate: async (request, session) => {
       const user = await getUserBySessionId(session);
 
@@ -26,9 +26,8 @@ export async function adminAuth(server) {
       }
 
       return { isValid: true };
-    }
+    },
   });
 
-  server.auth.default('adminSession');
+  server.auth.default("adminSession");
 }
-

@@ -1,31 +1,28 @@
-import { server as _server } from '@hapi/hapi';
-import Inert from '@hapi/inert';
-import Vision from '@hapi/vision';
+import { server as _server } from "@hapi/hapi";
+import Inert from "@hapi/inert";
+import Vision from "@hapi/vision";
 import Handlebars from "handlebars";
 
-import { home } from "./routers/home.js"
+import { home } from "./routers/home.js";
+import { staticFiles } from "./routers/staticFiles.js";
+import { admin } from "./routers/admin/login.js";
+import { adminAuth } from "./routers/admin/auth.js";
+import { rss } from "./routers/rss/rss.js";
+import { syncApis } from "./routers/admin/sync.js";
 import { podcastDetails } from "./routers/details.js";
-import { staticFiles } from './routers/staticFiles.js';
-import { admin } from './routers/admin/login.js';
-import { adminAuth } from './routers/admin/auth.js';
-import { editPodcastDetails } from './routers/admin/details.js'
-import { rss } from './routers/rss/rss.js';
-import { uploadVideoController } from './routers/admin/detail/file.js';
-import { syncApis } from './routers/admin/sync.js';
 
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { media } from './routers/admin/detail/mediaMontage.js';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 function registerViewFunctions() {
-  Handlebars.registerHelper('eq', (a, b) => a === b);
+  Handlebars.registerHelper("eq", (a, b) => a === b);
 }
 
 const init = async () => {
   const server = _server({
     port: 3000,
-    host: '0.0.0.0',
-    debug: { request: ['error'] },
+    host: "0.0.0.0",
+    debug: { request: ["error"] },
   });
 
   await server.register(Inert);
@@ -37,35 +34,31 @@ const init = async () => {
   server.views({
     engines: { html: Handlebars },
     relativeTo: __dirname,
-    partialsPath: ['templates/partials', 'templates/widgets'],
-    path: ['templates/pages', 'templates/partials', 'templates/widgets'],
+    partialsPath: ["templates/partials", "templates/widgets"],
+    path: ["templates/pages", "templates/partials", "templates/widgets"],
     layout: true,
-    layoutPath: 'templates/layouts',
+    layoutPath: "templates/layouts",
   });
 
-  registerViewFunctions()
+  registerViewFunctions();
 
   staticFiles(server);
 
   await adminAuth(server);
 
-  home(server);
   podcastDetails(server);
+  home(server);
   admin(server);
-  editPodcastDetails(server);
   rss(server);
-  uploadVideoController(server);
-  media(server);
   syncApis(server);
 
   await server.start();
-  console.log('Server running on %s', server.info.uri);
+  console.log("Server running on %s", server.info.uri);
 };
 
-process.on('unhandledRejection', (err) => {
+process.on("unhandledRejection", (err) => {
   console.info(err);
   process.exit(1);
 });
 
-init().then(() => console.log('Server started'));
-
+init().then(() => console.log("Server started"));

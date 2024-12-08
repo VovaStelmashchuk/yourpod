@@ -115,62 +115,6 @@ export async function uploadFile(key, body) {
   }
 }
 
-export async function uploadFileFromPath(key, filePath, contentType) {
-  try {
-    const fileContent = Fs.readFileSync(filePath);
-
-    const params = {
-      Bucket: bucketName,
-      Key: key,
-      Body: fileContent,
-      ContentType: contentType,
-    };
-
-    await client.send(new PutObjectCommand(params));
-
-    console.log(`File uploaded successfully, key = ${key}`);
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    throw error;
-  }
-}
-
-export async function downloadFile(key, localPath) {
-  console.log(`Downloading file ${key} to ${localPath}`);
-
-  try {
-    const command = new GetObjectCommand({
-      Bucket: bucketName,
-      Key: key,
-    });
-
-    const data = await client.send(command);
-
-    Fs.mkdirSync(localPath.split("/").slice(0, -1).join("/"), {
-      recursive: true,
-    });
-    const writableStream = Fs.createWriteStream(localPath);
-
-    // Pipe the data from the response to the file
-    data.Body.pipe(writableStream);
-
-    // Return a promise to ensure it completes before the function resolves
-    return new Promise((resolve, reject) => {
-      writableStream.on("finish", () => {
-        console.log(`Successfully downloaded file ${key} to ${localPath}`);
-        resolve();
-      });
-      writableStream.on("error", (err) => {
-        console.error("Error writing file to disk:", err);
-        reject(err);
-      });
-    });
-  } catch (err) {
-    console.error("Error downloading file:", err);
-    throw err; // Optionally rethrow the error for further handling
-  }
-}
-
 export async function getFileContent(key) {
   try {
     const command = new GetObjectCommand({

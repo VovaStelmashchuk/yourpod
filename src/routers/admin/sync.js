@@ -33,6 +33,8 @@ async function performShowSyncHandler(request, h) {
   let nextPageToken = null;
   let items = [];
 
+  console.log("Syncing show: ", showSlug, playlistId);
+
   do {
     const response = await getPlaylistItems(playlistId, nextPageToken);
     items = items.concat(response.items);
@@ -40,13 +42,17 @@ async function performShowSyncHandler(request, h) {
   } while (nextPageToken);
 
   const youtubeVideoItems = items.map((item) => {
+    let thumbnail = item.snippet.thumbnails.maxres;
+    if (!thumbnail) {
+      thumbnail = item.snippet.thumbnails.standard;
+    }
     return {
       slug: slugify(item.snippet.title, { lower: true, strict: true }),
       videoId: item.snippet.resourceId.videoId,
       title: item.snippet.title,
       description: item.snippet.description,
       publishedAt: item.snippet.publishedAt,
-      thumbnail: item.snippet.thumbnails.maxres.url,
+      thumbnail: thumbnail.url,
     };
   });
 
@@ -103,7 +109,7 @@ async function syncEpisodeHandler(request, h) {
 export function syncApis(server) {
   server.route({
     method: "GET",
-    path: "/admin/show/{showSlug}/sync",
+    path: "/admin/show/{showSlug}",
     handler: syncPageHandler,
     options: {
       auth: "adminSession",

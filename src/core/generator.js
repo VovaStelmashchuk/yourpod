@@ -1,10 +1,14 @@
-import { Podcast } from 'podcast';
+import { Podcast } from "podcast";
 
-import { getPodcastForRss } from './episodeRepo.js';
-import { buildObjectURL, getFileSizeInByte, uploadFile } from '../minio/utils.js';
-import { getShowBySlug } from '../core/podcastRepo.js';
+import { getPodcastForRss } from "./episodeRepo.js";
+import {
+  buildObjectURL,
+  getFileSizeInByte,
+  uploadFile,
+} from "../minio/utils.js";
+import { getShowBySlug } from "../core/podcastRepo.js";
 
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -29,37 +33,42 @@ export async function updateRss(showSlug) {
     feedUrl: `${startUrl}/${showSlug}/${rssFileName}`,
     siteUrl: host,
     webMaster: host,
-    generator: 'YourPod',
+    generator: "YourPod",
     imageUrl: logoUrl,
     author: author,
-    copyright: '© 20220-2024' + showInfo.showName,
-    language: 'ua',
-    categories: ['Technology'],
+    copyright: "© 20220-2024" + showInfo.showName,
+    language: "ua",
+    categories: ["Technology"],
     pubDate: pubDate,
     ttl: 60,
     itunesAuthor: author,
-    itunesType: 'episodic',
+    itunesType: "episodic",
     itunesSummary: description,
-    itunesOwner: { name: author, email: 'vovochkastelmashchuk@gmail.com' },
+    itunesOwner: { name: author, email: "vovochkastelmashchuk@gmail.com" },
     itunesExplicit: false,
-    itunesCategory: [{
-      text: 'Technology',
-    }, {
-      text: 'News',
-      subcats: [{
-        text: 'Tech News',
-      }],
-    }],
+    itunesCategory: [
+      {
+        text: "Technology",
+      },
+      {
+        text: "News",
+        subcats: [
+          {
+            text: "Tech News",
+          },
+        ],
+      },
+    ],
     itunesImage: logoUrl,
   });
 
-  const fileSizes = await Promise.all(podcasts.map(post =>
-    getFileSizeInByte(post.publicAudioFile)
-  ));
+  const fileSizes = await Promise.all(
+    podcasts.map((post) => getFileSizeInByte(post.publicAudioFile))
+  );
 
-  const podcastsUrl = await Promise.all(podcasts.map(post =>
-    buildObjectURL(post.publicAudioFile)
-  ));
+  const podcastsUrl = await Promise.all(
+    podcasts.map((post) => buildObjectURL(post.publicAudioFile))
+  );
 
   const podcastCount = podcasts.length;
 
@@ -87,7 +96,7 @@ export async function updateRss(showSlug) {
       itunesTitle: post.title,
       itunesDuration: duration,
       itunesExplicit: false,
-      itunesEpisodeType: 'full',
+      itunesEpisodeType: "full",
       itunesSeason: 2,
       itunesEpisode: podcastCount - index,
       itunesImage: logoUrl,
@@ -107,17 +116,24 @@ export function buildPublicChapters(chapters) {
   let previousChapterStartTimeSeconds = 0;
 
   chapters.forEach((chapter, index) => {
-    const chapterStartTimeInSeconds = chapter.time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
+    const chapterStartTimeInSeconds = chapter.time
+      .split(":")
+      .reduce((acc, time) => 60 * acc + +time, 0);
 
     if (chapter.isPublic !== false) {
-      const adjustedTimeInSeconds = chapterStartTimeInSeconds - totalPrivateChaptersTime;
+      const adjustedTimeInSeconds =
+        chapterStartTimeInSeconds - totalPrivateChaptersTime;
       adjustedChapters.push({
-        time: new Date(adjustedTimeInSeconds * 1000).toISOString().substr(11, 8),
+        time: new Date(adjustedTimeInSeconds * 1000)
+          .toISOString()
+          .substr(11, 8),
         description: chapter.description,
         timeInSeconds: chapter.timeInSeconds - totalPrivateChaptersTime,
       });
     } else {
-      const nextChapterTime = chapters[index + 1]?.time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
+      const nextChapterTime = chapters[index + 1]?.time
+        .split(":")
+        .reduce((acc, time) => 60 * acc + +time, 0);
       totalPrivateChaptersTime += nextChapterTime - chapterStartTimeInSeconds;
     }
 
@@ -128,69 +144,65 @@ export function buildPublicChapters(chapters) {
 }
 
 function buildRssDescription(post) {
-  let description = 'В цьому випуску ';
+  let description = "В цьому випуску ";
   if (post.charters) {
     const publicChapters = buildPublicChapters(post.charters);
-    description += '<ul>'
+    description += "<ul>";
     publicChapters
-      .filter(chapter => chapter.isPublic !== false)
-      .forEach(chapter => {
+      .filter((chapter) => chapter.isPublic !== false)
+      .forEach((chapter) => {
         description += `<li>${chapter.time} - <em>${chapter.description}</em></li>`;
       });
-    description += '</ul>'
+    description += "</ul>";
   }
 
   if (post.links) {
-    description += '<br>';
-    description += '<h3>Згадано в випуску</h3>';
-    description += '<ul>'
-    post.links.forEach(link => {
+    description += "<br>";
+    description += "<h3>Згадано в випуску</h3>";
+    description += "<ul>";
+    post.links.forEach((link) => {
       description += `<a href="${link.link}">${link.text}</a>`;
-      description += '<br>';
+      description += "<br>";
     });
-    description += '</ul>'
+    description += "</ul>";
   }
 
-  return description
+  return description;
 }
 
 export function buildYoutubePublicDescription(post) {
-  let description = 'В цьому випуску \n';
+  let description = "В цьому випуску \n";
   if (post.charters) {
     const publicChapters = buildPublicChapters(post.charters);
-    publicChapters
-      .forEach(chapter => {
-        description += `${chapter.time} - ${chapter.description} \n`;
-      });
+    publicChapters.forEach((chapter) => {
+      description += `${chapter.time} - ${chapter.description} \n`;
+    });
   }
 
-  return description + buildLinksBlock(post)
+  return description + buildLinksBlock(post);
 }
 
-
 export function buildYoutubePatreonDescription(post) {
-  let description = 'В цьому випуску \n';
+  let description = "В цьому випуску \n";
   if (post.charters) {
-    post.charters
-      .forEach(chapter => {
-        description += `${chapter.time} - ${chapter.description} \n`;
-      });
+    post.charters.forEach((chapter) => {
+      description += `${chapter.time} - ${chapter.description} \n`;
+    });
   }
 
-  return description + buildLinksBlock(post)
+  return description + buildLinksBlock(post);
 }
 
 function buildLinksBlock(post) {
-  let linksText = '';
+  let linksText = "";
   if (post.links) {
-    linksText += '\n';
-    linksText += 'Згадано в випуску \n';
-    post.links.forEach(link => {
+    linksText += "\n";
+    linksText += "Згадано в випуску \n";
+    post.links.forEach((link) => {
       linksText += `${link.link}`;
-      linksText += '\n';
+      linksText += "\n";
     });
   }
 
   return linksText;
 }
-

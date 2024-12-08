@@ -1,9 +1,14 @@
-<div class="container mx-auto p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+<div
+  class="container mx-auto p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+>
   {{#each shows}}
   <a href="{{url}}" class="no-underline bg-white p-4 rounded shadow-md">
     <div class="relative w-full aspect-square">
-      <img src="{{showLogoUrl}}" alt="Podcast logo"
-        class="w-full h-full object-cover rounded-t-md">
+      <img
+        src="{{showLogoUrl}}"
+        alt="Podcast logo"
+        class="w-full h-full object-cover rounded-t-md"
+      />
     </div>
     <h2 class="text-xl font-bold mt-4 line-clamp-3">{{showName}}</h2>
   </a>

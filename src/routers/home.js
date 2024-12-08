@@ -1,4 +1,3 @@
-import { getPublicPosts } from "../core/episodeRepo.js";
 import { getShowInfo } from "../core/podcastRepo.js";
 import dotenv from "dotenv";
 
