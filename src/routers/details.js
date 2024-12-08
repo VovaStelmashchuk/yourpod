@@ -1,60 +1,58 @@
-import { getPostBySlug } from "../core/episodeRepo.js";
-import { buildObjectURL } from "../minio/utils.js";
-import { buildPublicChapters } from "../core/generator.js";
 import { getShowInfo } from "../core/podcastRepo.js";
-import dotenv from 'dotenv';
 
-dotenv.config();
+function buildDescription(description, videoId) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
 
-const startUrl = process.env.S3_START_URL;
+  let processedText = description
+    .replace(urlRegex, function (url) {
+      return `<a class="text-green-500" href="${url}" target="_blank">${url}</a>`;
+    })
+    .replace(/\n/g, "<br>");
+
+  processedText =
+    `<a class="text-green-500" href="https://www.youtube.com/watch?v=${videoId}" > Подивитись відео на YouTube </a><br>` +
+    processedText;
+
+  return processedText;
+}
 
 async function podcastDetailsHandler(request, h) {
   const host = request.headers.host;
-  const showInfo = await getShowInfo(host)
-
+  const showInfo = await getShowInfo(host);
   const slug = request.params.slug;
 
-  const podcast = await getPostBySlug(showInfo.slug, slug);
+  const episode = showInfo.youtubeVideoItems.find(
+    (episode) => episode.slug === slug
+  );
 
-  const publicChapters = buildPublicChapters(podcast.charters)
+  console.log("episode", episode);
 
-  return h.view('podcastDetails',
+  return h.view(
+    "podcastDetails",
     {
+      videoId: episode.videoId,
       showName: showInfo.showName,
       header_links: showInfo.links,
-      title: podcast.title,
-      audioUrl: buildObjectURL(podcast.publicAudioFile),
-      imageUrl: `${startUrl}${showInfo.showLogoUrl}`,
-      chapters: publicChapters
-        .map(chapter => {
-          return {
-            time: chapter.time,
-            title: chapter.description,
-            timeInSeconds: chapter.timeInSeconds
-          }
-        }),
-      links: podcast.links
-        .map(link => {
-          return {
-            link: link.link,
-            text: link.text,
-          }
-        }),
+      description: buildDescription(
+        episode.description || "",
+        episode.videoId
+      ).trim(),
+      title: episode.title,
+      links: [],
     },
     {
-      layout: 'layout',
+      layout: "layout",
     }
   );
 }
 
 export function podcastDetails(server) {
   server.route({
-    method: 'GET',
-    path: '/podcast/{slug}',
+    method: "GET",
+    path: "/podcast/{slug}",
     handler: podcastDetailsHandler,
     options: {
-      auth: false
-    }
+      auth: false,
+    },
   });
 }
-

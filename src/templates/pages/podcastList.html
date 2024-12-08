@@ -1,17 +1,19 @@
-<div id="tab-content" role="tabpanel" class="tab-content grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    {{#each posts}}
-    <a href="{{url}}" class="no-underline bg-white p-4 rounded shadow-md">
-        <div class="relative w-full aspect-square">
-            <img src="{{imageUrl}}" alt="Podcast logo"
-                 class="w-full h-full object-cover rounded-t-md {{#if (eq type 'patreon')}}filter blur-md{{/if}}">
-            {{#if (eq type 'patreon')}}
-            <div class="absolute inset-0 flex justify-center items-center">
-                <span class="inline-flex bg-red-600 text-white text-xl font-semibold px-6 py-4 rounded-full">Patreon Special</span>
-            </div>
-            {{/if}}
-        </div>
-        <h2 class="text-xl font-bold mt-4 line-clamp-3">{{title}}</h2>
-        <p class="line-clamp-6">{{chartersDescription}}</p>
-    </a>
-    {{/each}}
+<div
+  id="tab-content"
+  role="tabpanel"
+  class="tab-content grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+>
+  {{#each posts}}
+  <a href="{{url}}" class="no-underline bg-white p-4 rounded shadow-md">
+    <div class="relative w-full aspect-square">
+      <img
+        src="{{imageUrl}}"
+        alt="Podcast logo"
+        class="w-full h-full object-cover rounded-t-md"
+      />
+    </div>
+    <h2 class="text-xl font-bold mt-4 line-clamp-3">{{title}}</h2>
+    <p class="line-clamp-6">{{chartersDescription}}</p>
+  </a>
+  {{/each}}
 </div>

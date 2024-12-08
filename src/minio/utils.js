@@ -1,8 +1,15 @@
-import { S3Client, GetObjectCommand, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+  HeadObjectCommand,
+} from "@aws-sdk/client-s3";
 
-import dotenv from 'dotenv';
-import Fs from 'fs'
-import url from 'url';
+import dotenv from "dotenv";
+import Fs from "fs";
+import url from "url";
+import ytdl from "ytdl-core";
+import { Upload } from "@aws-sdk/lib-storage";
 
 dotenv.config();
 
@@ -19,6 +26,55 @@ const client = new S3Client({
   region: process.env.S3_REGION,
   s3ForcePathStyle: true,
 });
+
+export async function streamYoutubeVideoAudioToS3(videoId, key) {
+  try {
+    const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    const output = Fs.createWriteStream("/tmp/audio.mp4");
+
+    ytdl(youtubeUrl)
+      .on("error", (err) => {
+        console.error("Error during download:", err);
+      })
+      .on("info", (info) => {
+        console.log(`Downloading audio from: ${info.videoDetails.title}`);
+      })
+      .pipe(output)
+      .on("finish", () => {
+        console.log(`Audio downloaded successfully to: ${outputPath}`);
+      });
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+async function uploadFileStream(key, body, contentType) {
+  try {
+    const upload = new Upload({
+      client,
+      params: {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+      },
+    });
+
+    upload.on("httpUploadProgress", (progress) => {
+      console.log(
+        `Upload progress: ${progress.loaded}/${
+          progress.total || "unknown total"
+        } bytes`
+      );
+    });
+
+    await upload.done();
+    console.log(`File uploaded successfully, key = ${key}`);
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    throw error;
+  }
+}
 
 export function buildObjectURL(path) {
   if (!path) {
@@ -55,7 +111,7 @@ export async function uploadFile(key, body) {
 
     console.log(`File uploaded successfully, key = ${key}`);
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error("Error uploading file:", error);
   }
 }
 
@@ -74,7 +130,7 @@ export async function uploadFileFromPath(key, filePath, contentType) {
 
     console.log(`File uploaded successfully, key = ${key}`);
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error("Error uploading file:", error);
     throw error;
   }
 }
@@ -90,7 +146,9 @@ export async function downloadFile(key, localPath) {
 
     const data = await client.send(command);
 
-    Fs.mkdirSync(localPath.split('/').slice(0, -1).join('/'), { recursive: true });
+    Fs.mkdirSync(localPath.split("/").slice(0, -1).join("/"), {
+      recursive: true,
+    });
     const writableStream = Fs.createWriteStream(localPath);
 
     // Pipe the data from the response to the file
@@ -98,17 +156,17 @@ export async function downloadFile(key, localPath) {
 
     // Return a promise to ensure it completes before the function resolves
     return new Promise((resolve, reject) => {
-      writableStream.on('finish', () => {
+      writableStream.on("finish", () => {
         console.log(`Successfully downloaded file ${key} to ${localPath}`);
         resolve();
       });
-      writableStream.on('error', (err) => {
-        console.error('Error writing file to disk:', err);
+      writableStream.on("error", (err) => {
+        console.error("Error writing file to disk:", err);
         reject(err);
       });
     });
   } catch (err) {
-    console.error('Error downloading file:', err);
+    console.error("Error downloading file:", err);
     throw err; // Optionally rethrow the error for further handling
   }
 }
@@ -124,7 +182,7 @@ export async function getFileContent(key) {
 
     return data.Body;
   } catch (error) {
-    console.error('Error getting file content:', error);
+    console.error("Error getting file content:", error);
     throw error;
   }
 }

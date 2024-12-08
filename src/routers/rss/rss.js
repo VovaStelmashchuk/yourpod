@@ -1,6 +1,6 @@
 import { getShowInfo } from "../../core/podcastRepo.js";
 import { getFileContent } from "../../minio/utils.js";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -12,16 +12,16 @@ async function rssHandler(request, h) {
 
   const rss = await getFileContent(`${showInfo.slug}/${rssFileName}`);
 
-  return h.response(rss).type('application/rss+xml');
+  return h.response(rss).type("application/rss+xml");
 }
 
 export function rss(server) {
   server.route({
-    method: 'GET',
-    path: '/rss.xml',
+    method: "GET",
+    path: "/rss.xml",
     handler: rssHandler,
     options: {
-      auth: false
-    }
-  })
+      auth: false,
+    },
+  });
 }

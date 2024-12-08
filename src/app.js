@@ -11,6 +11,7 @@ import { adminAuth } from './routers/admin/auth.js';
 import { editPodcastDetails } from './routers/admin/details.js'
 import { rss } from './routers/rss/rss.js';
 import { uploadVideoController } from './routers/admin/detail/file.js';
+import { syncApis } from './routers/admin/sync.js';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -55,6 +56,7 @@ const init = async () => {
   rss(server);
   uploadVideoController(server);
   media(server);
+  syncApis(server);
 
   await server.start();
   console.log('Server running on %s', server.info.uri);
