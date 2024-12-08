@@ -36,7 +36,7 @@ export async function updateRss(showSlug) {
     generator: "YourPod",
     imageUrl: logoUrl,
     author: author,
-    copyright: "© 20220-2024" + showInfo.showName,
+    copyright: "© 2020-2024" + showInfo.showName,
     language: "ua",
     categories: ["Technology"],
     pubDate: pubDate,
@@ -168,41 +168,4 @@ function buildRssDescription(post) {
   }
 
   return description;
-}
-
-export function buildYoutubePublicDescription(post) {
-  let description = "В цьому випуску \n";
-  if (post.charters) {
-    const publicChapters = buildPublicChapters(post.charters);
-    publicChapters.forEach((chapter) => {
-      description += `${chapter.time} - ${chapter.description} \n`;
-    });
-  }
-
-  return description + buildLinksBlock(post);
-}
-
-export function buildYoutubePatreonDescription(post) {
-  let description = "В цьому випуску \n";
-  if (post.charters) {
-    post.charters.forEach((chapter) => {
-      description += `${chapter.time} - ${chapter.description} \n`;
-    });
-  }
-
-  return description + buildLinksBlock(post);
-}
-
-function buildLinksBlock(post) {
-  let linksText = "";
-  if (post.links) {
-    linksText += "\n";
-    linksText += "Згадано в випуску \n";
-    post.links.forEach((link) => {
-      linksText += `${link.link}`;
-      linksText += "\n";
-    });
-  }
-
-  return linksText;
 }
