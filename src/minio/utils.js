@@ -5,11 +5,9 @@ import {
   HeadObjectCommand,
 } from "@aws-sdk/client-s3";
 
-import dotenv from "dotenv";
-import Fs from "fs";
-import url from "url";
-import ytdl from "ytdl-core";
 import { Upload } from "@aws-sdk/lib-storage";
+import dotenv from "dotenv";
+import url from "url";
 
 dotenv.config();
 
@@ -27,51 +25,31 @@ const client = new S3Client({
   s3ForcePathStyle: true,
 });
 
-export async function streamYoutubeVideoAudioToS3(videoId, key) {
-  try {
-    const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
-    const output = Fs.createWriteStream("/tmp/audio.mp4");
-
-    ytdl(youtubeUrl)
-      .on("error", (err) => {
-        console.error("Error during download:", err);
-      })
-      .on("info", (info) => {
-        console.log(`Downloading audio from: ${info.videoDetails.title}`);
-      })
-      .pipe(output)
-      .on("finish", () => {
-        console.log(`Audio downloaded successfully to: ${outputPath}`);
-      });
-  } catch (error) {
-    console.error("Error:", error);
+export async function downloadAndUploadImage(imageUrl, key) {
+  const response = await fetch(imageUrl);
+  if (!response.ok) {
+    throw new Error(
+      `Failed to download image: ${response.status} ${response.statusText}`
+    );
   }
-}
 
-async function uploadFileStream(key, body, contentType) {
+  const upload = new Upload({
+    client,
+    params: {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: key,
+      Body: response.body,
+      ContentType: "image/jpeg",
+    },
+  });
+
   try {
-    const upload = new Upload({
-      client,
-      params: {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: key,
-        Body: body,
-        ContentType: contentType,
-      },
-    });
-
-    upload.on("httpUploadProgress", (progress) => {
-      console.log(
-        `Upload progress: ${progress.loaded}/${
-          progress.total || "unknown total"
-        } bytes`
-      );
-    });
-
     await upload.done();
-    console.log(`File uploaded successfully, key = ${key}`);
+    console.log(
+      `Image streamed from ${imageUrl} and uploaded to S3 with key: ${key}`
+    );
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error(`Error uploading image stream: ${error.message}`);
     throw error;
   }
 }

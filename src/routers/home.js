@@ -21,28 +21,24 @@ async function homeHandler(request, h) {
   );
 }
 
-function buildShortDescription(description) {
-  let shortDescription = description;
-  const firstTwoZeroIndex = description.indexOf("00:00");
-  if (firstTwoZeroIndex !== -1) {
-    shortDescription = description.slice(firstTwoZeroIndex);
-  }
-  // remove all time stamps in format hh:mm:ss and '-' character
-  shortDescription = shortDescription.replace(/(\d{2}:\d{2}:\d{2})/g, "");
-  shortDescription = shortDescription.replace(/-/g, "");
-  return shortDescription;
-}
-
 async function podcastListHandler(request, h) {
   const host = request.headers.host;
   const showInfo = await getShowInfo(host);
 
-  const posts = showInfo.youtubeVideoItems.map((video) => ({
-    url: `/podcast/${video.slug}`,
-    imageUrl: `${startUrl}${showInfo.showLogoUrl}`,
-    title: video.title,
-    chartersDescription: buildShortDescription(video.description),
-  }));
+  const posts = showInfo.items.map((item) => {
+    let imageUrl;
+    if (item.image) {
+      imageUrl = `${startUrl}/${item.image}`;
+    } else {
+      imageUrl = `${startUrl}${showInfo.showLogoUrl}`;
+    }
+    return {
+      url: `/podcast/${item.slug}`,
+      imageUrl: `${imageUrl}`,
+      title: item.youtube.title,
+      chartersDescription: item.shortDescription,
+    };
+  });
 
   return h.view(
     "podcastList",

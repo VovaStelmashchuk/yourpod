@@ -1,12 +1,32 @@
 <div class="p-2">
   <div class="grid grid-cols-1 gap-4">
     {{#each posts}}
-    <div class="no-underline bg-white p-8 rounded shadow-md">
-      <h2 class="text-xl font-bold line-clamp-3">{{title}}</h2>
-      <p class="text-gray-600 mt-2">{{description}}</p>
+    <div
+      class="no-underline bg-white p-6 rounded shadow-md flex gap-4 items-start"
+    >
+      <div class="flex flex-col items-start">
+        <img
+          src="{{imageUrl}}"
+          alt="{{title}}"
+          class="w-24 object-cover rounded"
+        />
+        <button
+          hx-swap="none"
+          hx-post="{{refreshMediaUrl}}"
+          class="common-button w-full px-4 py-2 mt-4"
+        >
+          Refresh Media
+        </button>
+      </div>
+
+      <div class="flex-1">
+        <h2 class="text-xl font-bold">{{title}}</h2>
+        <p class="text-gray-600 mt-2">{{description}}</p>
+      </div>
     </div>
     {{/each}}
   </div>
+
   <button
     hx-swap="none"
     hx-post="{{performSyncUrl}}"
@@ -14,6 +34,7 @@
   >
     Run sync
   </button>
+
   <div class="text-gray-600 text-sm mt-2">
     Last playlist sync: {{lastSyncTime}}
   </div>
