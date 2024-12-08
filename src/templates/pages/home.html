@@ -1,27 +1,44 @@
 <div class="flex justify-center">
   <div id="tabs" hx-target="#tab-contents" role="tablist">
-    <button role="tab" aria-controls="tab-contents" aria-selected="true" hx-get="/tab-podcast-list"
-      class="px-4 py-2 font-semibold text-black bg-gray-200 rounded-t-md focus:outline-none selected">
+    <button
+      role="tab"
+      aria-controls="tab-contents"
+      aria-selected="true"
+      hx-get="/tab-podcast-list"
+      class="px-4 py-2 font-semibold text-black bg-gray-200 rounded-t-md focus:outline-none selected"
+    >
       Podcasts
     </button>
-    <button role="tab" aria-controls="tab-contents" aria-selected="false" hx-get="/tab-about"
-      class="px-4 py-2 font-semibold text-black bg-gray-200 rounded-t-md focus:outline-none">
+    <button
+      role="tab"
+      aria-controls="tab-contents"
+      aria-selected="false"
+      hx-get="/tab-about"
+      class="px-4 py-2 font-semibold text-black bg-gray-200 rounded-t-md focus:outline-none"
+    >
       About
     </button>
   </div>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      document.getElementById('tabs').addEventListener('click', function (event) {
-        if (event.target.tagName !== 'BUTTON') return
-        let currentTab = document.querySelector('[aria-selected=true]');
-        currentTab.setAttribute('aria-selected', 'false')
-        currentTab.classList.remove('selected')
-        let newTab = event.target
-        newTab.setAttribute('aria-selected', 'true')
-        newTab.classList.add('selected')
-      })
-    })
+    document.addEventListener("DOMContentLoaded", function () {
+      document
+        .getElementById("tabs")
+        .addEventListener("click", function (event) {
+          if (event.target.tagName !== "BUTTON") return;
+          let currentTab = document.querySelector("[aria-selected=true]");
+          currentTab.setAttribute("aria-selected", "false");
+          currentTab.classList.remove("selected");
+          let newTab = event.target;
+          newTab.setAttribute("aria-selected", "true");
+          newTab.classList.add("selected");
+        });
+    });
   </script>
 </div>
-<div id="tab-contents" role="tabpanel" hx-get="/tab-podcast-list" hx-trigger="load" class="p-4">
-</div>
+<div
+  id="tab-contents"
+  role="tabpanel"
+  hx-get="/tab-podcast-list"
+  hx-trigger="load"
+  class="p-4"
+></div>

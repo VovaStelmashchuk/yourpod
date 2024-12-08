@@ -1,18 +1,26 @@
 <div>
-  <div class="bg-gray-200 p-6 rounded-lg mb-8 text-center cursor-pointer" id="header">
+  <div
+    class="bg-gray-200 p-6 rounded-lg mb-8 text-center cursor-pointer"
+    id="header"
+  >
     <h1 class="text-3xl md:text-4xl font-bold mb-4">{{showName}}</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 container max-w-screen-xl mx-auto">
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 container max-w-screen-xl mx-auto"
+    >
       {{#each header_links}}
       <a href="{{link}}">
-        <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full">{{text}}</button>
+        <button
+          class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full"
+        >
+          {{text}}
+        </button>
       </a>
       {{/each}}
     </div>
   </div>
   <script>
-    document.getElementById('header')
-      .addEventListener('click', function () {
-        window.location.href = '/';
-      });
+    document.getElementById("header").addEventListener("click", function () {
+      window.location.href = "/";
+    });
   </script>
 </div>
