@@ -25,20 +25,22 @@ async function podcastListHandler(request, h) {
   const host = request.headers.host;
   const showInfo = await getShowInfo(host);
 
-  const posts = showInfo.items.map((item) => {
-    let imageUrl;
-    if (item.image) {
-      imageUrl = `${startUrl}/${item.image}`;
-    } else {
-      imageUrl = `${startUrl}${showInfo.showLogoUrl}`;
-    }
-    return {
-      url: `/podcast/${item.slug}`,
-      imageUrl: `${imageUrl}`,
-      title: item.youtube.title,
-      chartersDescription: item.shortDescription,
-    };
-  });
+  const posts = showInfo.items
+    .sort((a, b) => a.youtube.position - b.youtube.position)
+    .map((item) => {
+      let imageUrl;
+      if (item.image) {
+        imageUrl = `${startUrl}/${item.image}`;
+      } else {
+        imageUrl = `${startUrl}${showInfo.showLogoUrl}`;
+      }
+      return {
+        url: `/podcast/${item.slug}`,
+        imageUrl: `${imageUrl}`,
+        title: item.youtube.title,
+        chartersDescription: item.shortDescription,
+      };
+    });
 
   return h.view(
     "podcastList",

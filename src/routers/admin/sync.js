@@ -8,7 +8,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const youtubeApiKey = process.env.YOUTUBE_API_KEY;
-const startS3Url = process.env.S3_START_URL;
 
 async function getPlaylistItems(playlistId, nextPageToken) {
   const youtube = google.youtube({
@@ -68,34 +67,36 @@ async function performShowSyncHandler(request, h) {
     nextPageToken = response.nextPageToken;
   } while (nextPageToken);
 
-  const youtubeVideoItems = items.map((item) => {
-    let thumbnail = item.snippet.thumbnails.maxres;
-    if (!thumbnail) {
-      thumbnail = item.snippet.thumbnails.standard;
-    }
-    const youtubeDescription = item.snippet.description;
-    const videoId = item.snippet.resourceId.videoId;
-    return {
-      youtube: {
-        videoId: videoId,
-        title: item.snippet.title,
-        description: youtubeDescription,
-        publishedAt: item.snippet.publishedAt,
-        thumbnail: thumbnail.url,
-      },
-      slug: slugify(item.snippet.title, { lower: true, strict: true }),
-      shortDescription: buildShortDescription(youtubeDescription),
-      description: buildDescription(youtubeDescription, videoId),
-    };
-  });
+  const existVideoIds = (show.items || []).map((item) => item.youtube.videoId);
+
+  const youtubeVideoItems = items
+    .filter((item) => !existVideoIds.includes(item.snippet.resourceId.videoId))
+    .map((item) => {
+      let thumbnail = item.snippet.thumbnails.maxres;
+      if (!thumbnail) {
+        thumbnail = item.snippet.thumbnails.standard;
+      }
+      const youtubeDescription = item.snippet.description;
+      const videoId = item.snippet.resourceId.videoId;
+      return {
+        youtube: {
+          videoId: videoId,
+          title: item.snippet.title,
+          description: youtubeDescription,
+          thumbnail: thumbnail.url,
+          position: item.snippet.position,
+        },
+        slug: slugify(item.snippet.title, { lower: true, strict: true }),
+        shortDescription: buildShortDescription(youtubeDescription),
+        description: buildDescription(youtubeDescription, videoId),
+      };
+    });
 
   await Database.collection("shows").updateOne(
     { slug: showSlug },
     {
-      $set: {
-        lastSyncTime: new Date(),
-        items: youtubeVideoItems,
-      },
+      $set: { lastSyncTime: new Date() },
+      $addToSet: { items: { $each: youtubeVideoItems } },
     }
   );
 
@@ -106,13 +107,15 @@ async function syncPageHandler(request, h) {
   const showSlug = request.params.showSlug;
   const show = await getShowBySlug(showSlug);
 
-  const items = show.items.map((item) => ({
-    ...item,
-    title: item.youtube.title,
-    description: item.youtube.description,
-    imageUrl: item.youtube.thumbnail,
-    refreshMediaUrl: `/admin/show/${showSlug}/${item.slug}/refresh-media`,
-  }));
+  const items = (show.items || [])
+    .sort((a, b) => a.youtube.position - b.youtube.position)
+    .map((item) => ({
+      ...item,
+      title: item.youtube.title + " " + item.youtube.publishedAt,
+      description: item.youtube.description,
+      imageUrl: item.youtube.thumbnail,
+      refreshMediaUrl: `/admin/show/${showSlug}/${item.slug}/refresh-media`,
+    }));
 
   return h.view(
     "admin/episode_list",
