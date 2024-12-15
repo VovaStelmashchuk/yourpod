@@ -30,7 +30,7 @@ export async function updateRss(showSlug) {
   const feed = new Podcast({
     title: showInfo.showName,
     description: description,
-    feedUrl: `${startUrl}/${showSlug}/${rssFileName}`,
+    feedUrl: `${startUrl}/v2/${showSlug}/${rssFileName}`,
     siteUrl: host,
     webMaster: host,
     generator: "YourPod",
