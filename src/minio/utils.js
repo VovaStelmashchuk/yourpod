@@ -77,12 +77,13 @@ export async function getFileSizeInByte(key) {
   }
 }
 
-export async function uploadFile(key, body) {
+export async function uploadFile(key, body, contentType) {
   try {
     const params = {
       Bucket: bucketName,
       Key: key,
       Body: body,
+      ContentType: contentType,
     };
 
     await client.send(new PutObjectCommand(params));

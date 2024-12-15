@@ -10,6 +10,7 @@
           alt="{{title}}"
           class="w-24 object-cover rounded"
         />
+        {{#if isShowButton}}
         <button
           hx-swap="none"
           hx-post="{{refreshMediaUrl}}"
@@ -17,6 +18,14 @@
         >
           Refresh Media
         </button>
+        {{else}}
+        <div role="status">
+          <span
+            class="text-xl sr-only py-4 text-color-red-800 bg-color-black-100"
+            >{{syncStatus}}...</span
+          >
+        </div>
+        {{/if}}
       </div>
 
       <div class="flex-1">
@@ -33,6 +42,14 @@
     class="common-button w-full px-4 py-2 my-2"
   >
     Run sync
+  </button>
+
+  <button
+    hx-swap="none"
+    hx-post="{{buildRssUrl}}"
+    class="common-button w-full px-4 py-2 my-2"
+  >
+    Update RSS
   </button>
 
   <div class="text-gray-600 text-sm mt-2">

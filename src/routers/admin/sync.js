@@ -2,9 +2,10 @@ import { google } from "googleapis";
 import { getShowBySlug } from "../../core/showRepo.js";
 import { Database } from "../../core/client.js";
 import { downloadAndUploadImage } from "../../minio/utils.js";
-import slugify from "slugify";
+import standardSlugify from "standard-slugify";
 import dotenv from "dotenv";
-
+import pulse from "../../core/job/init.js";
+import { updateRss } from "../../core/generator.js";
 dotenv.config();
 
 const youtubeApiKey = process.env.YOUTUBE_API_KEY;
@@ -78,6 +79,7 @@ async function performShowSyncHandler(request, h) {
       }
       const youtubeDescription = item.snippet.description;
       const videoId = item.snippet.resourceId.videoId;
+
       return {
         youtube: {
           videoId: videoId,
@@ -86,7 +88,9 @@ async function performShowSyncHandler(request, h) {
           thumbnail: thumbnail.url,
           position: item.snippet.position,
         },
-        slug: slugify(item.snippet.title, { lower: true, strict: true }),
+        slug: standardSlugify(item.snippet.title, {
+          keepCase: false,
+        }),
         shortDescription: buildShortDescription(youtubeDescription),
         description: buildDescription(youtubeDescription, videoId),
       };
@@ -111,10 +115,12 @@ async function syncPageHandler(request, h) {
     .sort((a, b) => a.youtube.position - b.youtube.position)
     .map((item) => ({
       ...item,
-      title: item.youtube.title + " " + item.youtube.publishedAt,
+      title: item.youtube.title,
       description: item.youtube.description,
       imageUrl: item.youtube.thumbnail,
       refreshMediaUrl: `/admin/show/${showSlug}/${item.slug}/refresh-media`,
+      isShowButton: item.episodeSync === undefined,
+      syncStatus: item.episodeSync,
     }));
 
   return h.view(
@@ -123,6 +129,7 @@ async function syncPageHandler(request, h) {
       pageTitle: show.showName,
       posts: items,
       performSyncUrl: `/admin/show/${showSlug}/perform-sync`,
+      buildRssUrl: `/admin/show/${showSlug}/build-rss`,
       lastSyncTime: show.lastSyncTime,
     },
     {
@@ -131,19 +138,34 @@ async function syncPageHandler(request, h) {
   );
 }
 
+async function getYoutubeVideoPublishedAt(videoId) {
+  const youtube = google.youtube({
+    version: "v3",
+    auth: youtubeApiKey,
+  });
+
+  const response = await youtube.videos.list({
+    part: ["snippet"],
+    id: videoId,
+  });
+
+  console.log(response.data.items[0].snippet.publishedAt);
+  return new Date(response.data.items[0].snippet.publishedAt);
+}
+
 async function syncEpisodeHandler(request, h) {
   const showSlug = request.params.showSlug;
   const episodeSlug = request.params.episodeSlug;
   const show = await getShowBySlug(showSlug);
 
   const episode = show.items.find((item) => item.slug === episodeSlug);
+  const publishedAt = await getYoutubeVideoPublishedAt(episode.youtube.videoId);
 
-  console.log("Syncing episode: ", episode);
-  // Sync episode audio - video
-  /*await streamYoutubeVideoAudioToS3(
-    videoId,
-    `v2/${showSlug}/episodes/${videoId}.mp3`
-  );*/
+  pulse.now("download-audio", {
+    videoId: episode.youtube.videoId,
+    showSlug: showSlug,
+    episodeSlug: episodeSlug,
+  });
 
   const key = `v2/${showSlug}/episodes/${episodeSlug}.jpg`;
   downloadAndUploadImage(episode.youtube.thumbnail, key);
@@ -153,11 +175,13 @@ async function syncEpisodeHandler(request, h) {
     {
       $set: {
         "items.$.image": key,
+        "items.$.pubDate": publishedAt,
+        "items.$.episodeSync": "in-progress",
       },
     }
   );
 
-  return h.response().code(200);
+  return h.response().code(200).header("HX-Refresh", "true");
 }
 
 export function syncApis(server) {
@@ -183,6 +207,20 @@ export function syncApis(server) {
     method: "POST",
     path: "/admin/show/{showSlug}/perform-sync",
     handler: performShowSyncHandler,
+    options: {
+      auth: "adminSession",
+    },
+  });
+
+  server.route({
+    method: "POST",
+    path: "/admin/show/{showSlug}/build-rss",
+    handler: async (request, h) => {
+      const showSlug = request.params.showSlug;
+      console.log("Building RSS for show", showSlug);
+      updateRss(showSlug);
+      return h.response().code(200).header("HX-Refresh", "true");
+    },
     options: {
       auth: "adminSession",
     },

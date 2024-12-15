@@ -7,8 +7,6 @@ async function podcastDetailsHandler(request, h) {
 
   const episode = showInfo.items.find((episode) => episode.slug === slug);
 
-  console.log("episode", episode);
-
   return h.view(
     "podcastDetails",
     {

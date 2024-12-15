@@ -14,9 +14,17 @@ import { podcastDetails } from "./routers/details.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
+import { initPulse } from "./core/job/init.js";
+import { initDatabase } from "./core/client.js";
+import { initSyncAudioJobs } from "./core/job/download-audio.js"; 
+
 function registerViewFunctions() {
   Handlebars.registerHelper("eq", (a, b) => a === b);
 }
+
+export const initDb = async () => {
+  await initDatabase(); // Ensure MongoDB is connected
+};
 
 const init = async () => {
   const server = _server({
@@ -52,8 +60,15 @@ const init = async () => {
   rss(server);
   syncApis(server);
 
+  await initDb();
+  console.log("Database connected");
+
   await server.start();
   console.log("Server running on %s", server.info.uri);
+
+  await initPulse();
+  initSyncAudioJobs();
+  console.log("Job service started");
 };
 
 process.on("unhandledRejection", (err) => {

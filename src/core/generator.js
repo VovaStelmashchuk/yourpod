@@ -1,6 +1,5 @@
 import { Podcast } from "podcast";
 
-import { getPodcastForRss } from "./episodeRepo.js";
 import {
   buildObjectURL,
   getFileSizeInByte,
@@ -16,8 +15,9 @@ const startUrl = process.env.S3_START_URL;
 const host = process.env.BASE_URL;
 const rssFileName = process.env.PODCAST_RSS_FILE_NAME;
 
+const currentYear = new Date().getFullYear();
+
 export async function updateRss(showSlug) {
-  const podcasts = await getPodcastForRss(showSlug);
   const showInfo = await getShowBySlug(showSlug);
 
   const logoUrl = `${startUrl}${showInfo.showLogoUrl}`;
@@ -36,7 +36,7 @@ export async function updateRss(showSlug) {
     generator: "YourPod",
     imageUrl: logoUrl,
     author: author,
-    copyright: "© 2020-2024" + showInfo.showName,
+    copyright: `© 2020-${currentYear} ${showInfo.showName}`,
     language: "ua",
     categories: ["Technology"],
     pubDate: pubDate,
@@ -62,30 +62,32 @@ export async function updateRss(showSlug) {
     itunesImage: logoUrl,
   });
 
+  const podcasts = showInfo.items.filter((post) => post.audio !== undefined);
+
   const fileSizes = await Promise.all(
-    podcasts.map((post) => getFileSizeInByte(post.publicAudioFile))
+    podcasts.map((post) => getFileSizeInByte(post.audio))
   );
 
   const podcastsUrl = await Promise.all(
-    podcasts.map((post) => buildObjectURL(post.publicAudioFile))
+    podcasts.map((post) => buildObjectURL(post.audio))
   );
 
   const podcastCount = podcasts.length;
 
   podcasts.forEach((post, index) => {
-    let description = buildRssDescription(post);
+    let episodeDescription = post.description;
 
     let linkToEpisode = `${host}/podcast/${post.slug}`;
 
-    let guid = post._id.toString();
+    let guid = post.youtube.videoId;
 
-    let date = post.publish_date.toISOString();
+    let date = post.pubDate.toUTCString();
 
     const duration = post.duration;
 
     feed.addItem({
-      title: post.title,
-      description: description,
+      title: post.youtube.title,
+      description: episodeDescription,
       url: linkToEpisode,
       guid: guid,
       date: date,
@@ -101,71 +103,11 @@ export async function updateRss(showSlug) {
       itunesEpisode: podcastCount - index,
       itunesImage: logoUrl,
       itunesAuthor: author,
-      itunesSummary: description,
+      itunesSummary: episodeDescription,
     });
   });
 
   const xml = feed.buildXml();
 
-  await uploadFile(`${showSlug}/${rssFileName}`, xml);
-}
-
-export function buildPublicChapters(chapters) {
-  const adjustedChapters = [];
-  let totalPrivateChaptersTime = 0;
-  let previousChapterStartTimeSeconds = 0;
-
-  chapters.forEach((chapter, index) => {
-    const chapterStartTimeInSeconds = chapter.time
-      .split(":")
-      .reduce((acc, time) => 60 * acc + +time, 0);
-
-    if (chapter.isPublic !== false) {
-      const adjustedTimeInSeconds =
-        chapterStartTimeInSeconds - totalPrivateChaptersTime;
-      adjustedChapters.push({
-        time: new Date(adjustedTimeInSeconds * 1000)
-          .toISOString()
-          .substr(11, 8),
-        description: chapter.description,
-        timeInSeconds: chapter.timeInSeconds - totalPrivateChaptersTime,
-      });
-    } else {
-      const nextChapterTime = chapters[index + 1]?.time
-        .split(":")
-        .reduce((acc, time) => 60 * acc + +time, 0);
-      totalPrivateChaptersTime += nextChapterTime - chapterStartTimeInSeconds;
-    }
-
-    previousChapterStartTimeSeconds = chapterStartTimeInSeconds;
-  });
-
-  return adjustedChapters;
-}
-
-function buildRssDescription(post) {
-  let description = "В цьому випуску ";
-  if (post.charters) {
-    const publicChapters = buildPublicChapters(post.charters);
-    description += "<ul>";
-    publicChapters
-      .filter((chapter) => chapter.isPublic !== false)
-      .forEach((chapter) => {
-        description += `<li>${chapter.time} - <em>${chapter.description}</em></li>`;
-      });
-    description += "</ul>";
-  }
-
-  if (post.links) {
-    description += "<br>";
-    description += "<h3>Згадано в випуску</h3>";
-    description += "<ul>";
-    post.links.forEach((link) => {
-      description += `<a href="${link.link}">${link.text}</a>`;
-      description += "<br>";
-    });
-    description += "</ul>";
-  }
-
-  return description;
+  await uploadFile(`v2/${showSlug}/${rssFileName}`, xml, "application/rss+xml");
 }
