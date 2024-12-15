@@ -10,7 +10,7 @@ async function rssHandler(request, h) {
   const host = request.headers.host;
   const showInfo = await getShowInfo(host);
 
-  const rss = await getFileContent(`${showInfo.slug}/${rssFileName}`);
+  const rss = await getFileContent(`v2/${showInfo.slug}/${rssFileName}`);
 
   return h.response(rss).type("application/rss+xml");
 }
