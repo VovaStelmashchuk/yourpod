@@ -16,7 +16,7 @@ import { dirname } from "path";
 
 import { initPulse } from "./core/job/init.js";
 import { initDatabase } from "./core/client.js";
-import { initSyncAudioJobs } from "./core/job/download-audio.js"; 
+import { initSyncAudioJobs } from "./core/job/download-audio.js";
 
 function registerViewFunctions() {
   Handlebars.registerHelper("eq", (a, b) => a === b);
@@ -73,7 +73,6 @@ const init = async () => {
 
 process.on("unhandledRejection", (err) => {
   console.info(err);
-  process.exit(1);
 });
 
 init().then(() => console.log("Server started"));
