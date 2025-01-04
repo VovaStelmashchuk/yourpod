@@ -1,16 +1,10 @@
 import { getShowInfo } from "../../core/podcastRepo.js";
-import { getFileContent } from "../../minio/utils.js";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const rssFileName = process.env.PODCAST_RSS_FILE_NAME;
 
 async function rssHandler(request, h) {
   const host = request.headers.host;
   const showInfo = await getShowInfo(host);
 
-  const rss = await getFileContent(`v2/${showInfo.slug}/${rssFileName}`);
+  const rss = showInfo.rss;
 
   return h.response(rss).type("application/rss+xml");
 }

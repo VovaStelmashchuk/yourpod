@@ -1,24 +1,22 @@
 import { Podcast } from "podcast";
 
-import {
-  buildObjectURL,
-  getFileSizeInByte,
-  uploadFile,
-} from "../minio/utils.js";
+import { buildObjectURL, getFileSizeInByte } from "../minio/utils.js";
 import { getShowBySlug } from "../core/podcastRepo.js";
+
+import { Database } from "./client.js";
 
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const startUrl = process.env.S3_START_URL;
-const host = process.env.BASE_URL;
-const rssFileName = process.env.PODCAST_RSS_FILE_NAME;
 
 const currentYear = new Date().getFullYear();
 
 export async function updateRss(showSlug) {
   const showInfo = await getShowBySlug(showSlug);
+
+  const host = `https://${showInfo.mainDomain}`;
 
   const logoUrl = `${startUrl}${showInfo.showLogoUrl}`;
   const description = showInfo.about;
@@ -30,7 +28,7 @@ export async function updateRss(showSlug) {
   const feed = new Podcast({
     title: showInfo.showName,
     description: description,
-    feedUrl: `${startUrl}/v2/${showSlug}/${rssFileName}`,
+    feedUrl: `${startUrl}/v2/${showSlug}/rss.xml`,
     siteUrl: host,
     webMaster: host,
     generator: "YourPod",
@@ -109,5 +107,8 @@ export async function updateRss(showSlug) {
 
   const xml = feed.buildXml();
 
-  await uploadFile(`v2/${showSlug}/${rssFileName}`, xml, "application/rss+xml");
+  await Database.collection("shows").updateOne(
+    { slug: showSlug },
+    { $set: { rss: xml } }
+  );
 }
