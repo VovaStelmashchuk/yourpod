@@ -77,6 +77,9 @@ async function performShowSyncHandler(request, h) {
       if (!thumbnail) {
         thumbnail = item.snippet.thumbnails.standard;
       }
+      if (!thumbnail) {
+        console.log("Thumbnails not found", item.snippet);
+      }
       const youtubeDescription = item.snippet.description;
       const videoId = item.snippet.resourceId.videoId;
 
@@ -112,7 +115,15 @@ async function syncPageHandler(request, h) {
   const show = await getShowBySlug(showSlug);
 
   const items = (show.items || [])
-    .sort((a, b) => a.youtube.position - b.youtube.position)
+    .sort((a, b) => {
+      if (a.youtube.position < b.youtube.position) return -1;
+      if (a.youtube.position > b.youtube.position) return 1;
+
+      const dateA = new Date(a.pubDate);
+      const dateB = new Date(b.pubDate);
+
+      return dateB - dateA;
+    })
     .map((item) => ({
       ...item,
       title: item.youtube.title,

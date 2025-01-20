@@ -26,7 +26,15 @@ async function podcastListHandler(request, h) {
   const showInfo = await getShowInfo(host);
 
   const posts = showInfo.items
-    .sort((a, b) => a.youtube.position - b.youtube.position)
+    .sort((a, b) => {
+      if (a.youtube.position < b.youtube.position) return -1;
+      if (a.youtube.position > b.youtube.position) return 1;
+
+      const dateA = new Date(a.pubDate);
+      const dateB = new Date(b.pubDate);
+
+      return dateB - dateA;
+    })
     .map((item) => {
       let imageUrl;
       if (item.image) {

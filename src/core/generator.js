@@ -60,7 +60,17 @@ export async function updateRss(showSlug) {
     itunesImage: logoUrl,
   });
 
-  const podcasts = showInfo.items.filter((post) => post.audio !== undefined);
+  const podcasts = showInfo.items
+    .filter((post) => post.audio !== undefined)
+    .sort((a, b) => {
+      if (a.youtube.position < b.youtube.position) return -1;
+      if (a.youtube.position > b.youtube.position) return 1;
+
+      const dateA = new Date(a.pubDate);
+      const dateB = new Date(b.pubDate);
+
+      return dateB - dateA;
+    });
 
   const fileSizes = await Promise.all(
     podcasts.map((post) => getFileSizeInByte(post.audio))
