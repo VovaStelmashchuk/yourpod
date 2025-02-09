@@ -21,7 +21,7 @@ export async function updateRss(showSlug) {
   const logoUrl = `${startUrl}${showInfo.showLogoUrl}`;
   const description = showInfo.about;
 
-  const author = showInfo.authors;
+  const author = showInfo.author;
 
   const pubDate = new Date().toUTCString();
 
