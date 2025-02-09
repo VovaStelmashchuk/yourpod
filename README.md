@@ -11,5 +11,5 @@ npm run dev
 ## Deploy
 
 ```bash
-docker stack deploy -c docker-compose.yml stack-your-pod
+docker stack deploy -c compose.yml stack-your-pod
 ```
