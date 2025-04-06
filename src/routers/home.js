@@ -27,9 +27,6 @@ async function podcastListHandler(request, h) {
 
   const posts = showInfo.items
     .sort((a, b) => {
-      if (a.youtube.position < b.youtube.position) return -1;
-      if (a.youtube.position > b.youtube.position) return 1;
-
       const dateA = new Date(a.pubDate);
       const dateB = new Date(b.pubDate);
 
